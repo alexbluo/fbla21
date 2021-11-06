@@ -1,6 +1,7 @@
 package searcher;
 
 import java.util.*;
+import java.sql.*;
 
 public class Graph {
     // Nodes within Graph to store attractions and attributes
@@ -24,12 +25,14 @@ public class Graph {
         }
     }
 
+    // total number of nodes in graph object
+    int size;
     // Graph of relationships between attributes and attributes/attractions
     HashMap<String, LinkedList<Node>> attRelationships;
     // Stores the shortest distances from each attribute being searched for to each attraction
     // TODO: handle when new hashmap not created?
     HashMap<String, HashMap<String, Integer>> attDistances = new HashMap<>();
-    int size;
+
 
     // Weighted directed adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     // A Node pointing to nothing is an attraction
