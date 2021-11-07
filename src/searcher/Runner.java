@@ -6,9 +6,12 @@ import java.sql.*;
 
 // TODO for other computer download this sus jar thing and add to library from proj structure idk why just do it bc stackoverflow
 // https://www.javaguides.net/2019/11/mysql-connector-java-maven-dependency.html
-// https://mygeodata.cloud/data/download/osm/tourist-attractions/united-states-of-america--maryland??? what am i even doing
+// https://mygeodata.cloud/data/download/osm/tourist-attractions/united-states-of-america--maryland ??? what am i even doing
 // https://www.visithowardcounty.com/ please send help
 // https://dev-maryland.opendata.arcgis.com/apps/maryland::visit-maryland-interactive-map-tourism/explore why does this not even load
+// https://data.howardcountymd.gov/InteractiveMap.html# maybe add search layer -> search tourism -> do something with links somehow idk?? its something ig
+// https://stackoverflow.com/questions/2839321/connect-java-to-a-mysql-database
+
 public class Runner {
     public static void main(String[] args) throws IOException {
         String url = "jdbc:mysql://localhost:3306/javabase";
