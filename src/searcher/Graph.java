@@ -52,7 +52,7 @@ public class Graph {
 
     // Manually connects related attributes/attractions with weights to represent degree of relation
     protected void formGraph() {
-        // TODO: do tedious stuff... aka yelp + addEdge x 50+
+        // TODO: do tedious stuff... aka yelp + google sheets + mysql X 50 hf lol
     }
 
     // TODO FIGURE BELOW OUT LOL
