@@ -30,15 +30,17 @@ public class Graph {
     // Graph of relationships between attributes and attributes/attractions
     HashMap<String, LinkedList<Node>> attRelationships;
     // Stores the shortest distances from each attribute being searched for to each attraction
-    // TODO: handle when new hashmap not created?
+    // TODO: handle creating inner hashMaps later in dijkstra method when temporarily storing
     HashMap<String, HashMap<String, Integer>> attDistances = new HashMap<>();
-
+    // TODO: add variables necessary for database connection
 
     // Weighted directed adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     // A Node pointing to nothing is an attraction
     public Graph() {
         attRelationships = new HashMap<>();
         size = 0;
+        // TODO: establish connection
+
     }
 
     // Points attribute source to attribute/attraction dest
@@ -53,6 +55,9 @@ public class Graph {
     // Manually connects related attributes/attractions with weights to represent degree of relation
     protected void formGraph() {
         // TODO: do tedious stuff... aka yelp + google sheets + mysql X 50 hf lol
+
+        // TODO: possible to actually write sql in here and wrap using smthn
+
     }
 
     // TODO FIGURE BELOW OUT LOL
