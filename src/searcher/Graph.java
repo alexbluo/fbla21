@@ -9,9 +9,11 @@ public class Graph {
     private class Node {
         String dest;
         int weight;
-        public Node(String dest, int weight) {
+        boolean isAttraction = false;
+        public Node(String dest, int weight, boolean isAttraction) {
             this.dest = dest;
             this.weight = weight;
+            this.isAttraction = isAttraction;
         }
 
         // TODO: test if this infinite loops from calling equals inside
@@ -33,19 +35,31 @@ public class Graph {
     // TODO: handle creating inner hashMaps later in dijkstra method when temporarily storing
     HashMap<String, HashMap<String, Integer>> attDistances = new HashMap<>();
     // TODO: add variables necessary for database connection
+    Connection con;
 
     // Weighted directed adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     // A Node pointing to nothing is an attraction
     public Graph() {
         attRelationships = new HashMap<>();
         size = 0;
-        // TODO: establish connection
 
+        // establishes and initializes Connection con
+        String url = "jdbc:mysql://127.0.0.1:3306/mdcp";
+        String username = "luo";
+        String password = "luoMySQL123";
+        try  {
+            System.out.println("Connecting database...");
+            con = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connected!");
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot connect the database!", e);
+        }
     }
 
     // Points attribute source to attribute/attraction dest
-    protected void addEdge(String source, String dest, int weight) {
-        attRelationships.get("test").add(new Node("t", 2));
+    private void addEdge(String source, String dest, int weight, boolean isAttraction) {
+        // TODO: prob just set all weights to 1 by default and allow user to change with output report (zz)
+        attRelationships.get(source).add(new Node(dest, weight, isAttraction));
 
         // TODO handle situations where LinkedList is not created yet
 
