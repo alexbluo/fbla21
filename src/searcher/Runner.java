@@ -14,14 +14,14 @@ import java.sql.*;
 
 // wtf is hot backup
 
-// https://stackoverflow.com/questions/2839321/connect-java-to-a-mysql-database
+// https://www.sqlmaestro.com/download/ maybe look into later if needed but prob not necessary
 
 public class Runner {
     public static void main(String[] args) throws IOException {
 
         ArrayList<String> searchFor = new ArrayList<>();
         Graph graph = new Graph();
-        graph.formGraph();
+        graph.buildGraph();
 
         // Prompt user for as many attributes as desired until they enter search, with optional help
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -47,7 +47,7 @@ public class Runner {
                     break;
                 case "\\o":
                     // TODO: print semi interactive table of all the stuff
-
+                    // https://www.youtube.com/watch?v=r8Qiz9Bn1Ag maybe for later, gauge time after doing everything else
                     // TODO: make scuffed command line interface(?) to allow user to edit graph
 
 
