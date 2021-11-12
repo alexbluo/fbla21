@@ -16,3 +16,5 @@ readme file, source code, documentation of templates/libraries used,
 documentation of copyrighted material used.
 
 rubric - https://www.fbla-pbl.org/media/2021/08/FBLA-Rating-Sheets.pdf
+
+Program results update dynamically and are error free

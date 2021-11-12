@@ -2,15 +2,10 @@ package searcher;
 
 import java.util.*;
 import java.io.*;
-import java.sql.*;
+import searcher.Database;
 
-// GOAL: make big pool of stuff to search for by including everything related to the attributes
-// EXAMPLE: a sushi place might be connected to the description "sushi" which is connected to "food" so that searching for either can yield the same result
-// PROBLEM: this makes it so that the number of columns within a table of all the words related to an attribute cannot be predetermined
-// QUESTION: is there an alternative to my current method of stuffing everything in the same column and parse
-// TEMP SOLUTION: JUST DON'T IMPLEMENT THIS AT ALL LMAO ITS SO TEDIOUS
-// cannot find a separate dataset related to "sushi" for every single 200 or so attributes
-// either implement by manually stuffing and parse or don't do at all for now or find better way but unlikely
+//
+// TEMP SOLUTION: create a separate table for city and each description and just
 
 // wtf is hot backup
 
@@ -22,6 +17,7 @@ public class Runner {
         ArrayList<String> searchFor = new ArrayList<>();
         Graph graph = new Graph();
         graph.buildGraph();
+        Database.buildDatabase();
 
         // Prompt user for as many attributes as desired until they enter search, with optional help
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

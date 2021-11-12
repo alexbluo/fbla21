@@ -3,7 +3,7 @@ package searcher;
 
 
 import java.util.*;
-import java.sql.*;
+import searcher.Database;
 
 public class Graph {
     // Nodes within Graph to store attractions and attributes
@@ -31,14 +31,13 @@ public class Graph {
     }
 
     // Total number of nodes in graph object
-    int size;
+    private int size;
     // Graph of relationships between attributes and attributes/attractions
     HashMap<String, LinkedList<Node>> attRelationships;
     // Stores the shortest distances from each attribute being searched for to each attraction
     // TODO: handle creating inner hashMaps later in dijkstra method when temporarily storing
     HashMap<String, HashMap<String, Integer>> attDistances = new HashMap<>();
-    // TODO: add variables necessary for database connection
-    Connection con;
+
 
     // Weighted directed adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     // A Node pointing to nothing is an attraction
@@ -47,16 +46,7 @@ public class Graph {
         size = 0;
 
         // establishes and initializes Connection con
-        String url = "jdbc:mysql://127.0.0.1:3306/mdcp";
-        String username = "luo";
-        String password = "luoMySQL123";
-        try  {
-            System.out.println("Connecting database...");
-            con = DriverManager.getConnection(url, username, password);
-            System.out.println("Database connected!");
-        } catch (SQLException e) {
-            throw new IllegalStateException("Cannot connect the database!", e);
-        }
+
     }
 
     // Points attribute source to attribute/attraction dest
@@ -68,26 +58,6 @@ public class Graph {
 
         size++;
     }
-    // TODO add doc after figuring out wtf im doing
-    private void buildDatabase() {
-        try {
-            PreparedStatement createTable = con.prepareStatement("CREATE TABLE IF NOT EXISTS attractions(id int NOT NULL AUTO_INCREMENT, location_name varchar(255), link varchar(255), PRIMARY KEY(id))");
-            createTable.executeUpdate();
-            /* either download excel file as csv and use below or look a little into alternative with xlsx OR use some kind of translator, which looks messy but allows non-local integration
-            LOAD DATA LOCAL INFILE "/path/to/boats.csv" INTO TABLE boatdb.boats
-            FIELDS TERMINATED BY ','
-            LINES TERMINATED BY '\n'
-            edit below
-            IGNORE 1 LINES
-            (id, name, type, owner_id, @datevar, rental_price)
-             */
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            System.out.println("Tables created.");
-        }
-    }
-
 
     // Manually connects related attributes/attractions with weights to represent degree of relation
     protected void buildGraph() {
