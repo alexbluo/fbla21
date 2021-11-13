@@ -2,8 +2,9 @@ package searcher;
 
 import java.sql.*;
 
+// TODO: static or nonstatic methods?
 public class Database {
-    private final static Connection CON = getConnection();
+    private static final Connection CON = getConnection();
 
     private static Connection getConnection() {
         final String URL = "jdbc:mysql://127.0.0.1:3306/mdcp";
@@ -19,13 +20,15 @@ public class Database {
         }
         return c;
     }
+
     // TODO add doc after figuring out wtf im doing
     protected static void buildDatabase() {
         try {
+            // https://stackoverflow.com/questions/3271249/difference-between-statement-and-preparedstatement
             PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "location_name varchar(255), " +
-                    "link varchar(255), " +
+                    "website_link varchar(255), " +
                     "PRIMARY KEY(id))");
             PreparedStatement createAttributesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attributes (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -39,7 +42,6 @@ public class Database {
                     "REFERENCES attractions (id) " +
                     "ON DELETE CASCADE)");
             // TODO: maybe create tables of words related to each attribute later and add to graph as well
-
             createAttractionsTable.executeUpdate();
             createAttributesTable.executeUpdate();
             /* either download excel file as csv and use below or look a little into alternative with xlsx

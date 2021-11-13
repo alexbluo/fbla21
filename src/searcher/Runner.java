@@ -4,10 +4,9 @@ import java.util.*;
 import java.io.*;
 import searcher.Database;
 
-//
-// TEMP SOLUTION: create a separate table for city and each description and just
 
 // wtf is hot backup
+// wtf are output reports
 
 // https://www.sqlmaestro.com/download/ maybe look into later if needed but prob not necessary
 
@@ -19,12 +18,12 @@ public class Runner {
         graph.buildGraph();
         Database.buildDatabase();
 
-        // Prompt user for as many attributes as desired until they enter search, with optional help
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = null;
         String resp = "";
-
-        while (!resp.equals("\\s") && !resp.equals("\\o")) {
+        // Prompts user for as many attributes as desired until they enter search, with optional help
+        while (!resp.equals("\vcc c\s") && !resp.equals("\\o")) {
             System.out.print("Please enter an attribute you would like to search for, 'h' for help menu, o to view and edit the output report, or 's' to begin search: ");
             st = new StringTokenizer(br.readLine());
             resp = st.nextToken();
