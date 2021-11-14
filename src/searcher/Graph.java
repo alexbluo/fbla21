@@ -39,8 +39,7 @@ public class Graph {
     HashMap<String, Integer> attDistances = new HashMap<>();
 
 
-    // Weighted directed adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
-    // A Node pointing to nothing is an attraction
+    // Weighted undirected adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     public Graph() {
         attRelationships = new HashMap<>();
         size = 0;
@@ -53,13 +52,15 @@ public class Graph {
     private void addEdge(String source, String dest, int weight, boolean isAttraction) {
         // TODO: prob just set all weights to 1 by default and allow user to change with output report (zz)
         attRelationships.get(source).add(new Node(dest, weight, isAttraction));
-
-        // TODO handle situations where LinkedList is not created yet
+        attRelationships.get(dest).add(new Node(dest, weight, isAttraction));
+        // TODO handle situations where LinkedList is not created yet -
+        //  containsKey() else put(key, new LinkedList<Node>) and add to LL,
+        //  value already exists (see bottom), etc idk just care here
         // https://stackoverflow.com/questions/3019376/shortcut-for-adding-to-list-in-a-hashmap
         size++;
     }
 
-    // Manually connects related attributes/attractions with (MAYBE) weights to represent degree of relation
+    // Manually connects related attributes/attractions with (MAYBE LATER) weights to represent degree of relation
     protected void buildGraph() {
         // TODO: do tedious stuff... aka yelp + google sheets + mysql X 50 hf lol
 
@@ -79,5 +80,7 @@ public class Graph {
         // TODO: update attDistances within this method
     }
 
+    // TODO: USE PRINTGRAPH() FROM PREVIOUS PROJ TO CHECK GRAPH AFTER DOING OTHER STUFF FIRST AND BEFORE MAKING DIJKSTRA
 
+    // TODO: MAKE HELPER CONTAINSVALUE() (override?)
 }

@@ -23,7 +23,7 @@ public class Runner {
         StringTokenizer st = null;
         String resp = "";
         // Prompts user for as many attributes as desired until they enter search, with optional help
-        while (!resp.equals("\vcc c\s") && !resp.equals("\\o")) {
+        while (!resp.equals("\\s") && !resp.equals("\\o")) {
             System.out.print("Please enter an attribute you would like to search for, 'h' for help menu, o to view and edit the output report, or 's' to begin search: ");
             st = new StringTokenizer(br.readLine());
             resp = st.nextToken();
@@ -32,6 +32,7 @@ public class Runner {
             switch (resp) {
                 case "\\h":
                     // TODO help menu??
+                    // ex: for more accurate results, use plural nouns where appropriate
                     System.out.println("help.");
                     System.out.println("");
                     break;
