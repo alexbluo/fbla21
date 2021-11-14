@@ -2,10 +2,10 @@ package searcher;
 
 import java.sql.*;
 
-// TODO: static or nonstatic methods?
 public class Database {
     private static final Connection CON = getConnection();
 
+    // gets and returns a connection to the server with the specified URL, USERNAME, and PASSWORD
     private static Connection getConnection() {
         final String URL = "jdbc:mysql://127.0.0.1:3306/mdcp";
         final String USERNAME = "luo";
@@ -21,7 +21,16 @@ public class Database {
         return c;
     }
 
-    // TODO add doc after figuring out wtf im doing
+    // creates all tables and loads in data from csv files of several google sheets
+    // there are 4 tables:
+    // 'attractions' contains names of locations as well as links to their websites
+    // 'attributes' contains the city (or whatever is specified on the address) that the location is in,
+    //     the type of attraction, one key description which is used as the foreign key of 'related_descriptions,'
+    //     and two supporting descriptions
+    // 'related_locations' contains the county
+    // all tables except related_descriptions have a foreign key 'id' which refers to primary key 'id' of 'attractions'
+    // all locations in 'attractions' from https://www.busytourist.com/fun-things-to-do-in-maryland/
+    // nearby counties based on https://msa.maryland.gov/msa/mdmanual/36loc/html/02maps/seatb.html
     protected static void buildDatabase() {
         try {
             // https://stackoverflow.com/questions/3271249/difference-between-statement-and-preparedstatement

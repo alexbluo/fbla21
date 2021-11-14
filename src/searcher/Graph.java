@@ -1,7 +1,5 @@
 package searcher;
 
-
-
 import java.util.*;
 import searcher.Database;
 
@@ -54,13 +52,13 @@ public class Graph {
         attRelationships.get(source).add(new Node(dest, weight, isAttraction));
         attRelationships.get(dest).add(new Node(dest, weight, isAttraction));
         // TODO handle situations where LinkedList is not created yet -
-        //  containsKey() else put(key, new LinkedList<Node>) and add to LL,
-        //  value already exists (see bottom), etc idk just care here
+        //  containsKey() else put(key, new LinkedList<Node>) and add to LL
+        //  if containsKey() then check if .get.contains() to check duplicates values for key
         // https://stackoverflow.com/questions/3019376/shortcut-for-adding-to-list-in-a-hashmap
         size++;
     }
 
-    // Manually connects related attributes/attractions with (MAYBE LATER) weights to represent degree of relation
+    // TODO: describe adding process for each table
     protected void buildGraph() {
         // TODO: do tedious stuff... aka yelp + google sheets + mysql X 50 hf lol
 
@@ -82,5 +80,4 @@ public class Graph {
 
     // TODO: USE PRINTGRAPH() FROM PREVIOUS PROJ TO CHECK GRAPH AFTER DOING OTHER STUFF FIRST AND BEFORE MAKING DIJKSTRA
 
-    // TODO: MAKE HELPER CONTAINSVALUE() (override?)
 }

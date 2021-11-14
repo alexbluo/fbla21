@@ -1,14 +1,17 @@
 package searcher;
 
+// TODO: at very end remove wildcard imports on all classes
 import java.util.*;
 import java.io.*;
 import searcher.Database;
 
+// problem is there is no predetermined number of columns
+// and relationships can be super deep which makes it possible to have a ton of tables
+// example
+
 
 // wtf is hot backup
 // wtf are output reports
-
-// https://www.sqlmaestro.com/download/ maybe look into later if needed but prob not necessary
 
 public class Runner {
     public static void main(String[] args) throws IOException {
@@ -42,7 +45,7 @@ public class Runner {
 
                     break;
                 case "\\o":
-                    // TODO: print semi interactive table of all the stuff
+                    // TODO: print semi interactive table of all the stuff? but what even is an output report first
                     // https://www.youtube.com/watch?v=r8Qiz9Bn1Ag maybe for later, gauge time after doing everything else
                     // TODO: make scuffed command line interface(?) to allow user to edit graph
 
