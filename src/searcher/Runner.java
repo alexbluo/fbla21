@@ -32,13 +32,19 @@ public class Runner {
                 case "\\h":
                     // TODO help menu??
                     // ex: for more accurate results, use plural nouns where appropriate
-                    System.out.println("For the most accurate results, use plural nouns where appropriate");
-                    System.out.println("help.");
+                    System.out.println("For the most accurate results provide a city or county, use plural nouns where appropriate, and capitalize each word in multi-word terms");
+                    System.out.println("Example: ");
+                    System.out.println("        Baltimore");
+                    System.out.println("        Sea Creatures");
+                    System.out.println("        Education");
+                    System.out.println("        Animals");
+                    System.out.println("        Fish");
+
                     System.out.println("");
                     break;
                 case "\\s":
                     graph.dijkstra(searchFor);
-                    // TODO: somehow store and stuff and black magic boom boom spit out attraction
+                    // TODO: reset attDistances in Graph
 
                     break;
                 case "\\o":

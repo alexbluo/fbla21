@@ -29,7 +29,7 @@ public class Database {
     //     and two supporting descriptions
     // 'related_locations' contains the county
     // all tables except related_descriptions have a foreign key 'id' which refers to primary key 'id' of 'attractions'
-    // all locations in 'attractions' from https://www.busytourist.com/fun-things-to-do-in-maryland/
+    // most locations in 'attractions' from https://www.busytourist.com/fun-things-to-do-in-maryland/
     // nearby counties based on https://msa.maryland.gov/msa/mdmanual/36loc/html/02maps/seatb.html
     protected static void buildDatabase() {
         try {
