@@ -21,8 +21,8 @@ public class Database {
         return c;
     }
 
-    // creates all tables and loads in data from csv files of several google sheets
-    // there are 4 tables:
+    // creates all tables and loads in data from csv files of three different google sheets:
+    // TODO: update
     // 'attractions' contains names of locations as well as links to their websites
     // 'attributes' contains the city (or whatever is specified on the address) that the location is in,
     //     the type of attraction, one key description which is used as the foreign key of 'related_descriptions,'

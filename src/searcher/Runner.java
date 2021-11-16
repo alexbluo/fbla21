@@ -5,10 +5,6 @@ import java.util.*;
 import java.io.*;
 import searcher.Database;
 
-// problem is there is no predetermined number of columns
-// and relationships can be super deep which makes it possible to have a ton of tables
-// example
-
 
 // wtf is hot backup
 // wtf are output reports
@@ -36,6 +32,7 @@ public class Runner {
                 case "\\h":
                     // TODO help menu??
                     // ex: for more accurate results, use plural nouns where appropriate
+                    System.out.println("For the most accurate results, use plural nouns where appropriate");
                     System.out.println("help.");
                     System.out.println("");
                     break;
