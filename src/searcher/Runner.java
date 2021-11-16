@@ -12,10 +12,10 @@ import searcher.Database;
 public class Runner {
     public static void main(String[] args) throws IOException {
 
-        ArrayList<String> searchFor = new ArrayList<>();
         Graph graph = new Graph();
         graph.buildGraph();
-        Database.buildDatabase();
+        Database.buildTables();
+        Database.loadData();
 
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -23,7 +23,7 @@ public class Runner {
         String resp = "";
         // Prompts user for as many attributes as desired until they enter search, with optional help
         while (!resp.equals("\\s") && !resp.equals("\\o")) {
-            System.out.print("Please enter an attribute you would like to search for, 'h' for help menu, o to view and edit the output report, or 's' to begin search: ");
+            System.out.print("Please enter an attribute you would like to search for, '\\h' for help menu, '\\o' to view and edit the output report, or '\\e' to exit: ");
             st = new StringTokenizer(br.readLine());
             resp = st.nextToken();
             System.out.println("");
@@ -42,11 +42,6 @@ public class Runner {
 
                     System.out.println("");
                     break;
-                case "\\s":
-                    graph.dijkstra(searchFor);
-                    // TODO: reset attDistances in Graph
-
-                    break;
                 case "\\o":
                     // TODO: print semi interactive table of all the stuff? but what even is an output report first
                     // https://www.youtube.com/watch?v=r8Qiz9Bn1Ag maybe for later, gauge time after doing everything else
@@ -56,8 +51,11 @@ public class Runner {
 
                     System.out.println("");
                     break;
+                case "e":
+                    System.exit(0);
+                    break;
                 default:
-                    searchFor.add(resp);
+                    graph.dijkstra(resp);
                     break;
             }
         }

@@ -22,7 +22,7 @@ public class Database {
     }
 
     // creates all tables and loads in data from csv files of three different google sheets:
-    // TODO: update
+    // TODO: update doc
     // 'attractions' contains names of locations as well as links to their websites
     // 'attributes' contains the city (or whatever is specified on the address) that the location is in,
     //     the type of attraction, one key description which is used as the foreign key of 'related_descriptions,'
@@ -31,29 +31,21 @@ public class Database {
     // all tables except related_descriptions have a foreign key 'id' which refers to primary key 'id' of 'attractions'
     // most locations in 'attractions' from https://www.busytourist.com/fun-things-to-do-in-maryland/
     // nearby counties based on https://msa.maryland.gov/msa/mdmanual/36loc/html/02maps/seatb.html
-    protected static void buildDatabase() {
+    // TODO: revise and edit (ex: ON UPDATE/DELETE CASCADE necessary?)
+    // TODO: maybe add indexing later?
+    protected static void buildTables() {
         try {
             // https://stackoverflow.com/questions/3271249/difference-between-statement-and-preparedstatement
             // https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html
-            PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
-                    "id int NOT NULL AUTO_INCREMENT, " +
-                    "location_name varchar(255) NOT NULL, " +
-                    "website_link varchar(255) NOT NULL, " +
-                    "type varchar(64) NOT NULL, " +
-                    "city varchar(64) NOT NULL, " +
-                    "county_id int NOT NULL, " +
-                    "descriptions_id int NOT NULL, " +
-                    "PRIMARY KEY (id)" +
-                    ") ENGINE=INNODB;");
+
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS nearby_counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "county varchar(32), " +
                     "nc1 varchar(32), " +
                     "nc2 varchar(32), " +
                     "nc3 varchar(32), " +
-                    "PRIMARY KEY (id), " +
-                    "INDEX (id), " +
-                    "FOREIGN KEY (id) REFERENCES attractions (county_id) ON DELETE CASCADE) ENGINE=INNODB;");
+                    "PRIMARY KEY (id)) " +
+                    "ENGINE=INNODB;");
             PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "desc1 varchar(32), " +
@@ -63,25 +55,41 @@ public class Database {
                     "desc5 varchar(32), " +
                     "desc6 varchar(32), " +
                     "desc7 varchar(32), " +
+                    "PRIMARY KEY (id))");
+            PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
+                    "id int NOT NULL AUTO_INCREMENT, " +
+                    "location_name varchar(255) NOT NULL, " +
+                    "website_link varchar(255) NOT NULL, " +
+                    "type varchar(64) NOT NULL, " +
+                    "city varchar(64) NOT NULL, " +
+                    "county_id int NOT NULL, " +
+                    "descriptions_id int NOT NULL, " +
                     "PRIMARY KEY (id), " +
-                    "FOREIGN KEY (id) " +
-                    "REFERENCES attractions (descriptions_id) " +
-                    "ON DELETE CASCADE)");
+                    "FOREIGN KEY (county_id) " +
+                        "REFERENCES nearby_counties (id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (descriptions_id) " +
+                        "REFERENCES descriptions (id) ON DELETE CASCADE) " +
+                    "ENGINE=INNODB;");
             // TODO: maybe create tables of words related to each attribute later and add to graph as well
-            createAttractionsTable.executeUpdate();
             createCountiesTable.executeUpdate();
-            //createDescriptionsTable.executeUpdate();
-            /* either download excel file as csv and use below or look a little into alternative with xlsx
-            OR use some kind of translator, which looks messy but allows non-local integration
-            prob load csv like below because scaled integration isn't too important and for code readability
-            --------------
-            LOAD DATA LOCAL INFILE "/path/to/FILENAME.csv" INTO TABLE TABLENAME.DATABASENAME
-            FIELDS TERMINATED BY ','
-            LINES TERMINATED BY '\n'
-            edit below
-            IGNORE 1 LINES
-            (id, name, type, owner_id, @datevar, rental_price)
-             */
+            createDescriptionsTable.executeUpdate();
+            createAttractionsTable.executeUpdate();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // loads local csv files into tables
+    // ignore to prevent loading multiple times each run - https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#ignore-effect-on-execution
+    public static void loadData() {
+        try {
+            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA LOCAL INFILE \"./Downloads/mdcp_attractions.csv\" INTO TABLE attractions.mdcp" +
+                    "FIELDS TERMINATED BY ','" +
+                    "LINES TERMINATED BY '\\n'" +
+                    "IGNORE 1 LINES" +
+                    "(id, location_name, website_link, type, city, county_id, descriptions_id)");
+            loadAttractionsData.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

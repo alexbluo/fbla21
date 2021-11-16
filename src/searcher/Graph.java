@@ -68,8 +68,8 @@ public class Graph {
     }
 
     // TODO FIGURE BELOW OUT LOL
-    // Runs Dijkstra's algorithm on each attribute in searchFor, storing their distances to each attraction in attDistances
-    protected void dijkstra(List<String> searchFor) {
+    // Runs Dijkstra's algorithm from source, updating attDistances accordingly
+    protected void dijkstra(String source) {
         // equalsIgnoreCase will be helpful yw
 
 
@@ -80,4 +80,7 @@ public class Graph {
 
     // TODO: USE PRINTGRAPH() FROM PREVIOUS PROJ TO CHECK GRAPH AFTER DOING OTHER STUFF FIRST AND BEFORE MAKING DIJKSTRA
 
+
+
+    // TODO: add get output or some similar method to get and print... outputs...
 }
