@@ -38,21 +38,38 @@ public class Database {
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "location_name varchar(255), " +
                     "website_link varchar(255), " +
-                    "PRIMARY KEY(id))");
-            PreparedStatement createAttributesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attributes (" +
-                    "id int NOT NULL AUTO_INCREMENT, " +
+                    "type varchar(64), " +
                     "city varchar(64), " +
-                    "type varchar(32), " +
+                    "county_id int NOT NULL, " +
+                    "descriptions_id int NOT NULL AUTO_INCREMENT, " +
+                    "PRIMARY KEY(id)");
+            PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS nearby_counties (" +
+                    "id int NOT NULL AUTO_INCREMENT, " +
+                    "county varchar(32), " +
+                    "nc1 varchar(32), " +
+                    "nc2 varchar(32), " +
+                    "nc3 varchar(32), " +
+                    "PRIMARY KEY (id), " +
+                    "FOREIGN KEY (id) " +
+                    "REFERENCES attractions (county_id) " +
+                    "ON DELETE CASCADE)");
+            PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
+                    "id int NOT NULL AUTO_INCREMENT, " +
                     "desc1 varchar(32), " +
                     "desc2 varchar(32), " +
                     "desc3 varchar(32), " +
+                    "desc4 varchar(32), " +
+                    "desc5 varchar(32), " +
+                    "desc6 varchar(32), " +
+                    "desc7 varchar(32), " +
                     "PRIMARY KEY (id), " +
                     "FOREIGN KEY (id) " +
-                    "REFERENCES attractions (id) " +
+                    "REFERENCES attractions (descriptions_id) " +
                     "ON DELETE CASCADE)");
             // TODO: maybe create tables of words related to each attribute later and add to graph as well
             createAttractionsTable.executeUpdate();
-            createAttributesTable.executeUpdate();
+            createCountiesTable.executeUpdate();
+            createDescriptionsTable.executeUpdate();
             /* either download excel file as csv and use below or look a little into alternative with xlsx
             OR use some kind of translator, which looks messy but allows non-local integration
             prob load csv like below because scaled integration isn't too important and for code readability
