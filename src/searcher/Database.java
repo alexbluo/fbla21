@@ -44,7 +44,9 @@ public class Database {
                     "nc1 varchar(32), " +
                     "nc2 varchar(32), " +
                     "nc3 varchar(32), " +
-                    "PRIMARY KEY (id)) " +
+                    "PRIMARY KEY (id) " +
+                    "FOREIGN KEY (id) " +
+                            "REFERENCES attractions (id) ON UPDATE CASCADE ON DELETE CASCADE) " +
                     "ENGINE=INNODB;");
             PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -55,7 +57,10 @@ public class Database {
                     "desc5 varchar(32), " +
                     "desc6 varchar(32), " +
                     "desc7 varchar(32), " +
-                    "PRIMARY KEY (id))");
+                    "PRIMARY KEY (id)" +
+                    "FOREIGN KEY (id)" +
+                        "REFERENCES attractions (descriptions_id) ON UPDATE CASCADE ON DELETE CASCADE) " +
+                    "ENGINE=INNODB");
             PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "location_name varchar(255) NOT NULL, " +
@@ -64,11 +69,8 @@ public class Database {
                     "city varchar(64) NOT NULL, " +
                     "county_id int NOT NULL, " +
                     "descriptions_id int NOT NULL, " +
-                    "PRIMARY KEY (id), " +
-                    "FOREIGN KEY (county_id) " +
-                        "REFERENCES nearby_counties (id) ON DELETE CASCADE, " +
-                    "FOREIGN KEY (descriptions_id) " +
-                        "REFERENCES descriptions (id) ON DELETE CASCADE) " +
+                    "PRIMARY KEY (id)) " +
+
                     "ENGINE=INNODB;");
             // TODO: maybe create tables of words related to each attribute later and add to graph as well
             createCountiesTable.executeUpdate();
@@ -85,12 +87,12 @@ public class Database {
     // TODO huh
     public static void loadData() {
         try {
-            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA INFILE \"C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_attractions.csv\" IGNORE INTO TABLE mdcp.attractions " +
-                    "FIELDS TERMINATED BY ',' ENCLOSED BY '\"\"' " +
+            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_attractions.csv' INTO TABLE mdcp.attractions " +
+                    "FIELDS TERMINATED BY ',' ENCLOSED BY '\"'" +
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
                     "(id, location_name, website_link, type, city, county_id, descriptions_id)");
-            loadAttractionsData.executeUpdate();
+            System.out.println(loadAttractionsData.execute());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
