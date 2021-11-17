@@ -80,14 +80,15 @@ public class Database {
         }
     }
 
-    // loads local csv files into tables
-    // ignore to prevent loading multiple times each run - https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#ignore-effect-on-execution
+    // loads csv files into tables
+    // ignore to prevent loading multiple times each run - https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#ignore-effect-on-execution basically INSERT IGNORE instead of just INSERT
+    // TODO huh
     public static void loadData() {
         try {
-            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA LOCAL INFILE \"./Downloads/mdcp_attractions.csv\" INTO TABLE attractions.mdcp" +
-                    "FIELDS TERMINATED BY ','" +
-                    "LINES TERMINATED BY '\\n'" +
-                    "IGNORE 1 LINES" +
+            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA INFILE \"C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_attractions.csv\" IGNORE INTO TABLE mdcp.attractions " +
+                    "FIELDS TERMINATED BY ',' ENCLOSED BY '\"\"' " +
+                    "LINES TERMINATED BY '\\r\\n' " +
+                    "IGNORE 1 LINES " +
                     "(id, location_name, website_link, type, city, county_id, descriptions_id)");
             loadAttractionsData.executeUpdate();
         } catch (Exception ex) {
