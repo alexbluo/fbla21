@@ -37,26 +37,14 @@ public class Database {
         try {
             // https://stackoverflow.com/questions/3271249/difference-between-statement-and-preparedstatement
             // https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html
-            PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
-                    "id int NOT NULL AUTO_INCREMENT, " +
-                    "location_name varchar(255) NOT NULL, " +
-                    "website_link varchar(255) NOT NULL, " +
-                    "type varchar(64) NOT NULL, " +
-                    "city varchar(64) NOT NULL, " +
-                    "county_id int NOT NULL, " +
-                    "descriptions_id int NOT NULL, " +
-                    "PRIMARY KEY (id)) " +
 
-                    "ENGINE=INNODB;");
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS nearby_counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "county varchar(32), " +
                     "nc1 varchar(32), " +
                     "nc2 varchar(32), " +
                     "nc3 varchar(32), " +
-                    "PRIMARY KEY (id) " +
-                    "FOREIGN KEY (id) " +
-                            "REFERENCES attractions (id) ON UPDATE CASCADE ON DELETE CASCADE) " +
+                    "PRIMARY KEY (id)) " +
                     "ENGINE=INNODB;");
             PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -67,15 +55,27 @@ public class Database {
                     "desc5 varchar(32), " +
                     "desc6 varchar(32), " +
                     "desc7 varchar(32), " +
-                    "PRIMARY KEY (id)" +
-                    "FOREIGN KEY (id)" +
-                        "REFERENCES attractions (descriptions_id) ON UPDATE CASCADE ON DELETE CASCADE) " +
+                    "PRIMARY KEY (id)) " +
                     "ENGINE=INNODB;");
-
+            PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
+                    "id int NOT NULL AUTO_INCREMENT, " +
+                    "location_name varchar(255) NOT NULL, " +
+                    "website_link varchar(255) NOT NULL, " +
+                    "type varchar(64) NOT NULL, " +
+                    "city varchar(64) NOT NULL, " +
+                    "county_id int NOT NULL, " +
+                    "descriptions_id int NOT NULL, " +
+                    "PRIMARY KEY (id), " +
+                    "FOREIGN KEY (county_id) " +
+                        "REFERENCES nearby_counties (id) ON UPDATE CASCADE ON DELETE CASCADE, " +
+                    "FOREIGN KEY (descriptions_id) " +
+                        "REFERENCES descriptions (id) ON UPDATE CASCADE ON DELETE CASCADE) " +
+                    "ENGINE=INNODB;");
             // TODO: maybe create tables of words related to each attribute later and add to graph as well
-            createAttractionsTable.executeUpdate();
+
             createCountiesTable.executeUpdate();
             createDescriptionsTable.executeUpdate();
+            createAttractionsTable.executeUpdate();
 
 
         } catch (Exception ex) {
