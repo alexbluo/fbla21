@@ -122,4 +122,34 @@ public class Database {
             ex.printStackTrace();
         }
     }
+
+    protected static ResultSet getAttractionsRS() {
+        try {
+            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM attractions;");
+            return ps.executeQuery();
+        } catch (Exception ex) {
+            ex. printStackTrace();
+        }
+        return null;
+    }
+
+    protected static ResultSet getCountiesRS() {
+        try {
+            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM nearby_counties;");
+            return ps.executeQuery();
+        } catch (Exception ex) {
+            ex. printStackTrace();
+        }
+        return null;
+    }
+
+    protected static ResultSet getDescriptionsRS() {
+        try {
+            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM descriptions;");
+            return ps.executeQuery();
+        } catch (Exception ex) {
+            ex. printStackTrace();
+        }
+        return null;
+    }
 }

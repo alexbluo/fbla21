@@ -31,7 +31,7 @@ public class Graph {
     // Total number of nodes in graph object
     private int size;
     // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, LinkedList<Node>> attRelationships;
+    HashMap<String, LinkedList<Node>> relationships;
     // The sum of the shortest distances from all search attributes to each attraction
     // https://stackoverflow.com/questions/2776176/get-minvalue-of-a-mapkey-double use this to find output
     HashMap<String, Integer> attDistances = new HashMap<>();
@@ -39,7 +39,7 @@ public class Graph {
 
     // Weighted undirected adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     public Graph() {
-        attRelationships = new HashMap<>();
+        relationships = new HashMap<>();
         size = 0;
 
         // establishes and initializes Connection con
@@ -49,25 +49,39 @@ public class Graph {
     // Points attribute source to attribute/attraction dest
     private void addEdge(String source, String dest, int weight, boolean isAttraction) {
         // TODO: prob just set all weights to 1 by default and allow user to change with output report (zz)
-        attRelationships.get(source).add(new Node(dest, weight, isAttraction));
-        attRelationships.get(dest).add(new Node(dest, weight, isAttraction));
+
         // TODO handle situations where LinkedList is not created yet -
         //  containsKey() else put(key, new LinkedList<Node>) and add to LL
         //  if containsKey() then check if .get.contains() to check duplicates values for key
-        // https://stackoverflow.com/questions/3019376/shortcut-for-adding-to-list-in-a-hashmap
+        if (relationships.containsKey(source)) {
+            relationships.get(source).add(new Node(dest, weight, isAttraction));
+        } else {
+            relationships.put(source, new LinkedList<>());
+        }
+
+        if (relationships.containsKey(dest)) {
+            relationships.get(dest).add(new Node(dest, weight, isAttraction));
+        } else {
+            relationships.put(dest, new LinkedList<>());
+        }
         size++;
     }
 
     // TODO: describe adding process for each table
     protected void buildGraph() {
-        // TODO: do tedious stuff... aka yelp + google sheets + mysql X 50 hf lol
+        try {
+            while (Database.getAttractionsRS().next()) {
+
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         // TODO: loop query and add? also if (!=null) for variable num of columns like in related words table if that is even made
         // relate broad tables for city and type, just make a whole separate table for desc and pt each word and their related words in a new column
 
     }
 
-    // TODO FIGURE BELOW OUT LOL
     // Runs Dijkstra's algorithm from source, updating attDistances accordingly
     protected void dijkstra(String source) {
         // equalsIgnoreCase will be helpful yw
@@ -79,7 +93,23 @@ public class Graph {
     }
 
     // TODO: USE PRINTGRAPH() FROM PREVIOUS PROJ TO CHECK GRAPH AFTER DOING OTHER STUFF FIRST AND BEFORE MAKING DIJKSTRA
-
+    public void printGraph() {
+        for (Map.Entry<String, Object> entry : relationships) {
+            if (relationships.get(i).isEmpty()) {
+                System.out.print("Vertex " + i + " is connected to nothing");
+            } else {
+                System.out.print("Vertex " + i + " is connected to: ");
+            }
+            for (int j = 0; j < relationships.get(i).size(); j++) {
+                if (j == relationships.get(i).size() - 1) {
+                    System.out.print(relationships.get(i).get(j).dest + " with distance " + relationships.get(i).get(j).weight);
+                } else {
+                    System.out.print(relationships.get(i).get(j).dest + " with distance " + relationships.get(i).get(j).weight + ", ");
+                }
+            }
+            System.out.println();
+        }
+    }
 
 
     // TODO: add get output or some similar method to get and print... outputs...
