@@ -40,21 +40,21 @@ public class Database {
 
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS nearby_counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
-                    "county varchar(32), " +
-                    "nc1 varchar(32), " +
-                    "nc2 varchar(32), " +
-                    "nc3 varchar(32), " +
+                    "county varchar(32) DEFAULT NULL, " +
+                    "nc1 varchar(32) DEFAULT NULL, " +
+                    "nc2 varchar(32) DEFAULT NULL, " +
+                    "nc3 varchar(32) DEFAULT NULL, " +
                     "PRIMARY KEY (id)) " +
                     "ENGINE=INNODB;");
             PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
-                    "desc1 varchar(32), " +
-                    "desc2 varchar(32), " +
-                    "desc3 varchar(32), " +
-                    "desc4 varchar(32), " +
-                    "desc5 varchar(32), " +
-                    "desc6 varchar(32), " +
-                    "desc7 varchar(32), " +
+                    "desc1 varchar(32) DEFAULT NULL, " +
+                    "desc2 varchar(32) DEFAULT NULL, " +
+                    "desc3 varchar(32) DEFAULT NULL, " +
+                    "desc4 varchar(32) DEFAULT NULL, " +
+                    "desc5 varchar(32) DEFAULT NULL, " +
+                    "desc6 varchar(32) DEFAULT NULL, " +
+                    "desc7 varchar(32) DEFAULT NULL, " +
                     "PRIMARY KEY (id)) " +
                     "ENGINE=INNODB;");
             PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
@@ -88,11 +88,23 @@ public class Database {
     // TODO huh
     public static void loadData() {
         try {
+            PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_nearby_counties.csv' INTO TABLE mdcp.nearby_counties " +
+                    "FIELDS TERMINATED BY ',' " +
+                    "LINES TERMINATED BY '\\r\\n' " +
+                    "IGNORE 1 LINES " +
+                    "(id, county, nc1, nc2, nc3)");
+            PreparedStatement loadDescriptionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_descriptions.csv' INTO TABLE mdcp.descriptions " +
+                    "FIELDS TERMINATED BY ',' " +
+                    "LINES TERMINATED BY '\\r\\n' " +
+                    "IGNORE 1 LINES " +
+                    "(id, desc1, desc2, desc3, desc4, desc5, desc6, desc7)");
             PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_attractions.csv' INTO TABLE mdcp.attractions " +
-                    "FIELDS TERMINATED BY ',' ENCLOSED BY '\"'" +
+                    "FIELDS TERMINATED BY ',' " +
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
                     "(id, location_name, website_link, type, city, county_id, descriptions_id)");
+            System.out.println(loadCountiesData.execute());
+            System.out.println(loadDescriptionsData.execute());
             System.out.println(loadAttractionsData.execute());
         } catch (Exception ex) {
             ex.printStackTrace();

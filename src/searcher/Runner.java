@@ -11,12 +11,10 @@ import searcher.Database;
 
 public class Runner {
     public static void main(String[] args) throws IOException {
-
         Graph graph = new Graph();
         graph.buildGraph();
         Database.buildTables();
         Database.loadData();
-
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = null;
