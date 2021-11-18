@@ -27,7 +27,7 @@ public class Database {
     // 'attributes' contains the city (or whatever is specified on the address) that the location is in,
     //     the type of attraction, one key description which is used as the foreign key of 'related_descriptions,'
     //     and two supporting descriptions
-    // 'related_locations' contains the county
+    // 'nearby_counties' contains the county as well as up to three nearby counties
     // all tables except related_descriptions have a foreign key 'id' which refers to primary key 'id' of 'attractions'
     // most locations in 'attractions' from https://www.busytourist.com/fun-things-to-do-in-maryland/
     // nearby counties based on https://msa.maryland.gov/msa/mdmanual/36loc/html/02maps/seatb.html
@@ -40,7 +40,7 @@ public class Database {
 
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS nearby_counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
-                    "county varchar(32) DEFAULT NULL, " +
+                    "county varchar(32) NOT NULL, " +
                     "nc1 varchar(32) DEFAULT NULL, " +
                     "nc2 varchar(32) DEFAULT NULL, " +
                     "nc3 varchar(32) DEFAULT NULL, " +
@@ -85,20 +85,32 @@ public class Database {
 
     // loads csv files into tables
     // ignore to prevent loading multiple times each run - https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#ignore-effect-on-execution basically INSERT IGNORE instead of just INSERT
-    // TODO huh
+    // https://stackoverflow.com/questions/2675323/mysql-load-null-values-from-csv-data all hail guy on the internet
     public static void loadData() {
         try {
-            PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_nearby_counties.csv' INTO TABLE mdcp.nearby_counties " +
+            PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_nearby_counties.csv' IGNORE INTO TABLE mdcp.nearby_counties " +
                     "FIELDS TERMINATED BY ',' " +
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
-                    "(id, county, nc1, nc2, nc3)");
-            PreparedStatement loadDescriptionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_descriptions.csv' INTO TABLE mdcp.descriptions " +
+                    "(id, county, @c1, @c2, @c3) " +
+                    "SET " +
+                    "nc1 = NULLIF(@c1, ''), " +
+                    "nc2 = NULLIF(@c2, ''), " +
+                    "nc3 = NULLIF(@c3, '');");
+            PreparedStatement loadDescriptionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_descriptions.csv' IGNORE INTO TABLE mdcp.descriptions " +
                     "FIELDS TERMINATED BY ',' " +
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
-                    "(id, desc1, desc2, desc3, desc4, desc5, desc6, desc7)");
-            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_attractions.csv' INTO TABLE mdcp.attractions " +
+                    "(id, @d1, @d2, @d3, @d4, @d5, @d6, @d7)" +
+                    "SET " +
+                    "desc1 = NULLIF(@d1, ''), " +
+                    "desc2 = NULLIF(@d2, ''), " +
+                    "desc3 = NULLIF(@d3, ''), " +
+                    "desc4 = NULLIF(@d4, ''), " +
+                    "desc5 = NULLIF(@d5, ''), " +
+                    "desc6 = NULLIF(@d6, ''), " +
+                    "desc7 = NULLIF(@d7, '');");
+            PreparedStatement loadAttractionsData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_attractions.csv' IGNORE INTO TABLE mdcp.attractions " +
                     "FIELDS TERMINATED BY ',' " +
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
