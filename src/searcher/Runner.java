@@ -12,9 +12,15 @@ import searcher.Database;
 public class Runner {
     public static void main(String[] args) throws IOException {
         Graph graph = new Graph();
+        try {
+            System.out.println("Database connecting...");
+            Database.buildTables();
+            Database.loadData();
+        } catch (Exception ex) {
+            throw new IllegalStateException("Cannot connect to database", ex);
+        }
         graph.buildGraph();
-        Database.buildTables();
-        Database.loadData();
+
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = null;

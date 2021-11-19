@@ -2,6 +2,8 @@ package searcher;
 
 import java.sql.*;
 
+// STATIC IS VERY SMALL PERFORMANCE COST IN INITIALIZING CON EVERY TIME BUT VERY SMALL MEMORY ADVANTAGE FOR NOT ALWAYS STORING STATES OF DATABASE,
+// OVERALL DOESN'T REALLY MATTER IN THE FIRST PLACE BC ONLY CALLED AT BEGINNING
 public class Database {
     private static final Connection CON = getConnection();
 
@@ -10,13 +12,11 @@ public class Database {
         final String URL = "jdbc:mysql://127.0.0.1:3306/mdcp";
         final String USERNAME = "luo";
         final String PASSWORD = "luoMySQL123";
-        Connection c;
+        Connection c = null;
         try {
-            System.out.println("Connecting database...");
             c = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            System.out.println("Database connected!");
-        } catch (SQLException e) {
-            throw new IllegalStateException("Cannot connect the database!", e);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return c;
     }
@@ -125,7 +125,7 @@ public class Database {
 
     protected static ResultSet getAttractionsRS() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM attractions;");
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM attractions;");
             return ps.executeQuery();
         } catch (Exception ex) {
             ex. printStackTrace();
@@ -135,7 +135,7 @@ public class Database {
 
     protected static ResultSet getCountiesRS() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM nearby_counties;");
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM nearby_counties;");
             return ps.executeQuery();
         } catch (Exception ex) {
             ex. printStackTrace();
@@ -145,7 +145,7 @@ public class Database {
 
     protected static ResultSet getDescriptionsRS() {
         try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM descriptions;");
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM descriptions;");
             return ps.executeQuery();
         } catch (Exception ex) {
             ex. printStackTrace();

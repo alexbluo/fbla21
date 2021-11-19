@@ -1,12 +1,12 @@
 package searcher;
 
+import java.sql.*;
 import java.util.*;
-import searcher.Database;
 
 public class Graph {
-    // Nodes within Graph to store attractions and attributes
+    // Nodes within Graph to store attractions, indicated by isAttraction, and attributes
     // TODO: might need to store predecessor? not implemented for now
-    private class Node {
+    private static class Node implements Comparable<Node> {
         String dest;
         int weight;
         boolean isAttraction = false;
@@ -17,15 +17,32 @@ public class Graph {
             this.isAttraction = isAttraction;
         }
 
-        // TODO: test if this infinite loops from calling equals inside
         @Override
+        // override compareTo so that nodes in priorityQueue can be sorted in dijkstra
+        public int compareTo(Node n) {
+            if (this.weight > n.weight) {
+                return 1;
+            } else if (this.weight < n.weight) {
+                return -1;
+            }
+            return 0;
+        }
+
+        @Override
+        // override equals so that it is possible to check if marked set contains a node in dijkstra
         public boolean equals(Object o) {
             if (o instanceof Node) {
                 Node toCompare = (Node) o;
-                return toCompare.dest.equals(this.dest) && toCompare.weight == this.weight;
+                return toCompare.dest.equals(this.dest) && toCompare.weight == this.weight && toCompare.isAttraction == this.isAttraction;
             }
             return false;
         }
+
+        /*@Override
+        // override hashcode because overriding equals
+        public int hashCode() {
+            TODO put some hashing algo or something
+        }*/
     }
 
     // Total number of nodes in graph object
@@ -53,33 +70,31 @@ public class Graph {
         // TODO handle situations where LinkedList is not created yet -
         //  containsKey() else put(key, new LinkedList<Node>) and add to LL
         //  if containsKey() then check if .get.contains() to check duplicates values for key
-        if (relationships.containsKey(source)) {
-            relationships.get(source).add(new Node(dest, weight, isAttraction));
-        } else {
+        if (!relationships.containsKey(source)) {
             relationships.put(source, new LinkedList<>());
         }
+        relationships.get(source).add(new Node(dest, weight, isAttraction));
 
-        if (relationships.containsKey(dest)) {
-            relationships.get(dest).add(new Node(dest, weight, isAttraction));
-        } else {
+        if (!relationships.containsKey(dest)) {
             relationships.put(dest, new LinkedList<>());
         }
+        relationships.get(dest).add(new Node(source, weight, isAttraction));
         size++;
     }
 
     // TODO: describe adding process for each table
     protected void buildGraph() {
         try {
+            ResultSet attractions = Database.getAttractionsRS();
+            ResultSet counties = Database.getCountiesRS();
+            ResultSet descriptions = Database.getDescriptionsRS();
             while (Database.getAttractionsRS().next()) {
+                // do stuff... remember if not null also why is this infinite looping lmao
 
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        // TODO: loop query and add? also if (!=null) for variable num of columns like in related words table if that is even made
-        // relate broad tables for city and type, just make a whole separate table for desc and pt each word and their related words in a new column
-
     }
 
     // Runs Dijkstra's algorithm from source, updating attDistances accordingly
@@ -92,19 +107,19 @@ public class Graph {
         // TODO: update attDistances within this method
     }
 
-    // TODO: USE PRINTGRAPH() FROM PREVIOUS PROJ TO CHECK GRAPH AFTER DOING OTHER STUFF FIRST AND BEFORE MAKING DIJKSTRA
+    // TODO use to check after buildGraph and also add doc bc im too lazy to rn
     public void printGraph() {
-        for (Map.Entry<String, Object> entry : relationships) {
-            if (relationships.get(i).isEmpty()) {
-                System.out.print("Vertex " + i + " is connected to nothing");
+        for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                System.out.print(entry.getKey() + " is connected to nothing");
             } else {
-                System.out.print("Vertex " + i + " is connected to: ");
+                System.out.print(entry.getKey() + " is connected to: ");
             }
-            for (int j = 0; j < relationships.get(i).size(); j++) {
-                if (j == relationships.get(i).size() - 1) {
-                    System.out.print(relationships.get(i).get(j).dest + " with distance " + relationships.get(i).get(j).weight);
+            for (int j = 0; j < entry.getValue().size(); j++) {
+                if (j == entry.getValue().size() - 1) {
+                    System.out.print(entry.getValue().get(j).dest + " with distance " + entry.getValue().get(j).weight);
                 } else {
-                    System.out.print(relationships.get(i).get(j).dest + " with distance " + relationships.get(i).get(j).weight + ", ");
+                    System.out.print(entry.getValue().get(j).dest + " with distance " + entry.getValue().get(j).weight + ", ");
                 }
             }
             System.out.println();
@@ -113,4 +128,11 @@ public class Graph {
 
 
     // TODO: add get output or some similar method to get and print... outputs...
+
+    public static void main(String[] args) {
+        Graph g = new Graph();
+        g.buildGraph();
+        g.printGraph();
+
+    }
 }
