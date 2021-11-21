@@ -69,7 +69,7 @@ public class Graph {
 
         // TODO handle situations where LinkedList is not created yet -
         //  containsKey() else put(key, new LinkedList<Node>) and add to LL
-        //  if containsKey() then check if .get.contains() to check duplicates values for key
+        //  if containsKey() then check if .get.contains() to check duplicates values for key alex what were u even thinking about when u wrote this
         if (!relationships.containsKey(source)) {
             relationships.put(source, new LinkedList<>());
         }
@@ -88,9 +88,10 @@ public class Graph {
             ResultSet attractions = Database.getAttractionsRS();
             ResultSet counties = Database.getCountiesRS();
             ResultSet descriptions = Database.getDescriptionsRS();
-            while (Database.getAttractionsRS().next()) {
+            while (attractions.next()) {
+                PreparedStatement getCountiesRow =
                 // do stuff... remember if not null also why is this infinite looping lmao
-
+                break;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -132,6 +133,7 @@ public class Graph {
     public static void main(String[] args) {
         Graph g = new Graph();
         g.buildGraph();
+
         g.printGraph();
 
     }

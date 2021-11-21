@@ -44,7 +44,8 @@ public class Database {
                     "nc1 varchar(32) DEFAULT NULL, " +
                     "nc2 varchar(32) DEFAULT NULL, " +
                     "nc3 varchar(32) DEFAULT NULL, " +
-                    "PRIMARY KEY (id)) " +
+                    "PRIMARY KEY (id) " +
+                    "INDEX (id)) " +
                     "ENGINE=INNODB;");
             PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -55,7 +56,7 @@ public class Database {
                     "desc5 varchar(32) DEFAULT NULL, " +
                     "desc6 varchar(32) DEFAULT NULL, " +
                     "desc7 varchar(32) DEFAULT NULL, " +
-                    "PRIMARY KEY (id)) " +
+
                     "ENGINE=INNODB;");
             PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -66,6 +67,8 @@ public class Database {
                     "county_id int NOT NULL, " +
                     "descriptions_id int NOT NULL, " +
                     "PRIMARY KEY (id), " +
+                    "INDEX (county_id), " +
+                    "INDEX (descriptions_id), " +
                     "FOREIGN KEY (county_id) " +
                         "REFERENCES nearby_counties (id) ON UPDATE CASCADE ON DELETE CASCADE, " +
                     "FOREIGN KEY (descriptions_id) " +
