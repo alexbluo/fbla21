@@ -49,7 +49,6 @@ public class Graph {
     // Adjacency list of relationships between attributes and attributes/attractions
     HashMap<String, LinkedList<Node>> relationships;
     // The sum of the shortest distances from all search attributes to each attraction
-    // https://stackoverflow.com/questions/2776176/get-minvalue-of-a-mapkey-double use this to find output
     HashMap<String, Integer> attDistances = new HashMap<>();
 
 
@@ -74,11 +73,7 @@ public class Graph {
             relationships.put(dest, new LinkedList<>());
         }
 
-        if (isAttraction) {
-            relationships.get(dest).add(new Node(source, weight, true));
-        } else {
-            relationships.get(dest).add(new Node(source, weight, false));
-        }
+        relationships.get(dest).add(new Node(source, weight, isAttraction));
         relationships.get(source).add(new Node(dest, weight, false));
         // needed? size++;
     }
@@ -157,19 +152,18 @@ public class Graph {
                 potential = sourceDists.get(currentVisitNode.dest) + tempVisitNode.weight;
 
                 if (potential < initial) {
-                    // TODO need to somehow find center of ALL search attributes
                     sourceDists.replace(tempVisitNode.dest, potential);
+                    // TODO need to figure out where and how to put this in (add to last search terms dists but how)
+                    if (tempVisitNode.isAttraction) {
+                        attDistances.put(tempVisitNode.dest, potential);
+                    }
                 }
                 pq.add(tempVisitNode);
-                if (tempVisitNode.isAttraction) {
-                    attDistances.put(tempVisitNode.dest, potential);
-                }
             }
-
         }
 
         marked.add(currentVisitNode);
-        // TODO: update attDistances within this method if node.isAttraction put() or something
+
     }
 
     // TODO use to check after buildGraph and also add doc bc im too lazy to rn
