@@ -38,13 +38,13 @@ public class Database {
             // https://stackoverflow.com/questions/3271249/difference-between-statement-and-preparedstatement
             // https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html
 
-            PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS nearby_counties (" +
+            PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "county varchar(32) NOT NULL, " +
                     "nc1 varchar(32) DEFAULT NULL, " +
                     "nc2 varchar(32) DEFAULT NULL, " +
                     "nc3 varchar(32) DEFAULT NULL, " +
-                    "PRIMARY KEY (id) " +
+                    "PRIMARY KEY (id), " +
                     "INDEX (id)) " +
                     "ENGINE=INNODB;");
             PreparedStatement createDescriptionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS descriptions (" +
@@ -56,7 +56,7 @@ public class Database {
                     "desc5 varchar(32) DEFAULT NULL, " +
                     "desc6 varchar(32) DEFAULT NULL, " +
                     "desc7 varchar(32) DEFAULT NULL, " +
-
+                    "INDEX (id)) " +
                     "ENGINE=INNODB;");
             PreparedStatement createAttractionsTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS attractions (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -70,7 +70,7 @@ public class Database {
                     "INDEX (county_id), " +
                     "INDEX (descriptions_id), " +
                     "FOREIGN KEY (county_id) " +
-                        "REFERENCES nearby_counties (id) ON UPDATE CASCADE ON DELETE CASCADE, " +
+                        "REFERENCES counties (id) ON UPDATE CASCADE ON DELETE CASCADE, " +
                     "FOREIGN KEY (descriptions_id) " +
                         "REFERENCES descriptions (id) ON UPDATE CASCADE ON DELETE CASCADE) " +
                     "ENGINE=INNODB;");
@@ -91,7 +91,7 @@ public class Database {
     // https://stackoverflow.com/questions/2675323/mysql-load-null-values-from-csv-data all hail guy on the internet
     public static void loadData() {
         try {
-            PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_nearby_counties.csv' IGNORE INTO TABLE mdcp.nearby_counties " +
+            PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_counties.csv' IGNORE INTO TABLE mdcp.counties " +
                     "FIELDS TERMINATED BY ',' " +
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
@@ -138,7 +138,7 @@ public class Database {
 
     protected static ResultSet getCountiesRS() {
         try {
-            PreparedStatement ps = CON.prepareStatement("SELECT * FROM nearby_counties;");
+            PreparedStatement ps = CON.prepareStatement("SELECT * FROM counties;");
             return ps.executeQuery();
         } catch (Exception ex) {
             ex. printStackTrace();

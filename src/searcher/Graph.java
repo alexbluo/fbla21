@@ -7,9 +7,9 @@ public class Graph {
     // Nodes within Graph to store attractions, indicated by isAttraction, and attributes
     // TODO: might need to store predecessor? not implemented for now
     private static class Node implements Comparable<Node> {
-        String dest;
-        int weight;
-        boolean isAttraction = false;
+        private String dest;
+        private int weight;
+        private final boolean isAttraction;
 
         public Node(String dest, int weight, boolean isAttraction) {
             this.dest = dest;
@@ -41,11 +41,11 @@ public class Graph {
         /*@Override
         // override hashcode because overriding equals
         public int hashCode() {
-            TODO put some hashing algo or something
+            TODO put some hashing algo or something idk
         }*/
     }
 
-    // Total number of nodes in graph object
+    // TODO Total number of nodes in graph object EDIT: probably not needed at all and if updated like below its not even accurate lol
     private int size;
     // Adjacency list of relationships between attributes and attributes/attractions
     HashMap<String, LinkedList<Node>> relationships;
@@ -63,23 +63,28 @@ public class Graph {
 
     }
 
-    // Points attribute source to attribute/attraction dest
+    // connects SOURCE and DEST together
+    // all attractions should be passed in as SOURCE
     private void addEdge(String source, String dest, int weight, boolean isAttraction) {
         // TODO: prob just set all weights to 1 by default and allow user to change with output report (zz)
 
         // TODO handle situations where LinkedList is not created yet -
         //  containsKey() else put(key, new LinkedList<Node>) and add to LL
-        //  if containsKey() then check if .get.contains() to check duplicates values for key alex what were u even thinking about when u wrote this
+        //  if containsKey() then check if .get.contains() to check duplicates values for key alex what were u even thinking about when u wrote this /nvm
         if (!relationships.containsKey(source)) {
             relationships.put(source, new LinkedList<>());
         }
-        relationships.get(source).add(new Node(dest, weight, isAttraction));
-
         if (!relationships.containsKey(dest)) {
             relationships.put(dest, new LinkedList<>());
         }
-        relationships.get(dest).add(new Node(source, weight, isAttraction));
-        size++;
+
+        if (isAttraction) {
+            relationships.get(source).add(new Node(dest, weight, true));
+        } else {
+            relationships.get(source).add(new Node(dest, weight, false));
+        }
+        relationships.get(dest).add(new Node(source, weight, false));
+        // needed? size++;
     }
 
     // TODO: describe adding process for each table
@@ -88,10 +93,35 @@ public class Graph {
             ResultSet attractions = Database.getAttractionsRS();
             ResultSet counties = Database.getCountiesRS();
             ResultSet descriptions = Database.getDescriptionsRS();
-            while (attractions.next()) {
-                PreparedStatement getCountiesRow =
-                // do stuff... remember if not null also why is this infinite looping lmao
-                break;
+            assert counties != null;
+            ResultSetMetaData countiesMD = counties.getMetaData();
+            assert descriptions != null;
+            ResultSetMetaData descMD = descriptions.getMetaData();
+
+            // add edges from the broadest attributes to the closest related attributes to attractions to ensure every attraction node is marked as an attraction
+            while (true) {
+                assert attractions != null;
+                if (!attractions.next()) break;
+
+                counties.absolute(attractions.getInt("county_id"));
+                descriptions.absolute(attractions.getInt("descriptions_id"));
+
+                this.addEdge(attractions.getString("location_name"), attractions.getString("type"), 1, true);
+                this.addEdge(attractions.getString("location_name"), attractions.getString("city"), 1, true);
+                this.addEdge(attractions.getString("location_name"), counties.getString("county"), 1, true);
+
+                for (int i = 1; i <= descMD.getColumnCount() - 1; i++) {
+                    if (descriptions.getString("desc" + i) != null) {
+                        this.addEdge(attractions.getString("location_name"), descriptions.getString("desc" + i), 1, true);
+                    }
+                }
+
+                for (int i = 1; i <= countiesMD.getColumnCount() - 2; i++) {
+                    if (counties.getString("nc" + i) != null) {
+                        this.addEdge(counties.getString("county"), counties.getString("nc" + i), 1, false);
+                    }
+                }
+
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -129,7 +159,9 @@ public class Graph {
 
 
     // TODO: add get output or some similar method to get and print... outputs...
-
+    // add all lowest distance Strings from attDistances to a hashSet and do below for each
+    // note... print link by first retrieving ResultSet of just the row from attractions table with query PreparedStatement
+    // then just System.out.println(RS.getString("website_link")); but probably a bit more complicated... lol
     public static void main(String[] args) {
         Graph g = new Graph();
         g.buildGraph();
