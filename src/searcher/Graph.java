@@ -58,9 +58,6 @@ public class Graph {
     public Graph() {
         relationships = new HashMap<>();
         size = 0;
-
-        // establishes and initializes Connection con
-
     }
 
     // connects SOURCE and DEST together
@@ -79,11 +76,11 @@ public class Graph {
         }
 
         if (isAttraction) {
-            relationships.get(source).add(new Node(dest, weight, true));
+            relationships.get(dest).add(new Node(source, weight, true));
         } else {
-            relationships.get(source).add(new Node(dest, weight, false));
+            relationships.get(dest).add(new Node(source, weight, false));
         }
-        relationships.get(dest).add(new Node(source, weight, false));
+        relationships.get(source).add(new Node(dest, weight, false));
         // needed? size++;
     }
 
@@ -97,12 +94,10 @@ public class Graph {
             ResultSetMetaData countiesMD = counties.getMetaData();
             assert descriptions != null;
             ResultSetMetaData descMD = descriptions.getMetaData();
+            assert attractions != null;
 
             // add edges from the broadest attributes to the closest related attributes to attractions to ensure every attraction node is marked as an attraction
-            while (true) {
-                assert attractions != null;
-                if (!attractions.next()) break;
-
+            while (attractions.next()) {
                 counties.absolute(attractions.getInt("county_id"));
                 descriptions.absolute(attractions.getInt("descriptions_id"));
 
@@ -128,14 +123,54 @@ public class Graph {
         }
     }
 
+    PriorityQueue<Node> pq;
+    Set<Node> marked;
+    HashMap<String, Integer> sourceDists;
     // Runs Dijkstra's algorithm from source, updating attDistances accordingly
     protected void dijkstra(String source) {
         // equalsIgnoreCase will be helpful yw
+        pq = new PriorityQueue<>();
+        marked = new HashSet<>();
+        sourceDists = new HashMap<>();
 
+        for (String s : relationships.keySet()) {
+            sourceDists.put(s, Integer.MAX_VALUE);
+        }
 
+        sourceDists.replace(source, 0);
 
+        // maybe review this part?
+        pq.add(new Node(source, 0, false));
 
-        // TODO: update attDistances within this method
+        while (!pq.isEmpty()) {
+            Node r = pq.poll();
+            relax(r);
+        }
+    }
+
+    private void relax(Node currentVisitNode) {
+        for (Node relaxingNode : relationships.get(currentVisitNode.dest)) {
+
+            if (!marked.contains(relaxingNode)) {
+                int initial;
+                int potential;
+
+                initial = sourceDists.get(relaxingNode.dest);
+                potential = sourceDists.get(currentVisitNode.dest) + relaxingNode.weight;
+
+                if (potential < initial) {
+                    // TODO need to somehow find center of ALL search attributes
+                    sourceDists.replace(relaxingNode.dest, potential);
+                    // TODO why is it ! instead of inverse??? lol
+                    if (relaxingNode.isAttraction) {
+                        attDistances.put(relaxingNode.dest, potential);
+                    }
+                }
+                pq.add(relaxingNode);
+            }
+        }
+        marked.add(currentVisitNode);
+        // TODO: update attDistances within this method if node.isAttraction put() or something
     }
 
     // TODO use to check after buildGraph and also add doc bc im too lazy to rn
@@ -157,16 +192,25 @@ public class Graph {
         }
     }
 
+    protected boolean validSearch(String resp) {
+        return relationships.containsKey(resp);
+    }
 
     // TODO: add get output or some similar method to get and print... outputs...
     // add all lowest distance Strings from attDistances to a hashSet and do below for each
     // note... print link by first retrieving ResultSet of just the row from attractions table with query PreparedStatement
     // then just System.out.println(RS.getString("website_link")); but probably a bit more complicated... lol
+    protected void printOutput() {
+        for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+
     public static void main(String[] args) {
         Graph g = new Graph();
         g.buildGraph();
-
-        g.printGraph();
+        g.dijkstra("Food");
+        g.printOutput();
 
     }
 }
