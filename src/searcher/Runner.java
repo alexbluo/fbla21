@@ -62,7 +62,7 @@ public class Runner {
                     break;
                 default:
                     if (graph.validSearch(resp)) {
-                        System.out.println("Not a valid search attribute, please enter another");
+                        System.out.println("Not a valid search attribute, please enter something else");
                     } else {
                         graph.dijkstra(resp);
                         graph.printOutput();

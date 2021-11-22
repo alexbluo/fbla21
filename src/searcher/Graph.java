@@ -4,8 +4,7 @@ import java.sql.*;
 import java.util.*;
 
 public class Graph {
-    // Nodes within Graph to store attractions, indicated by isAttraction, and attributes
-    // TODO: might need to store predecessor? not implemented for now
+    // Nodes within Graph to store names of attractions, indicated by isAttraction, and attributes
     private static class Node implements Comparable<Node> {
         private String dest;
         private int weight;
@@ -149,32 +148,32 @@ public class Graph {
     }
 
     private void relax(Node currentVisitNode) {
-        for (Node relaxingNode : relationships.get(currentVisitNode.dest)) {
-
-            if (!marked.contains(relaxingNode)) {
+        for (Node tempVisitNode : relationships.get(currentVisitNode.dest)) {
+            if (!marked.contains(tempVisitNode)) {
                 int initial;
                 int potential;
 
-                initial = sourceDists.get(relaxingNode.dest);
-                potential = sourceDists.get(currentVisitNode.dest) + relaxingNode.weight;
+                initial = sourceDists.get(tempVisitNode.dest);
+                potential = sourceDists.get(currentVisitNode.dest) + tempVisitNode.weight;
 
                 if (potential < initial) {
                     // TODO need to somehow find center of ALL search attributes
-                    sourceDists.replace(relaxingNode.dest, potential);
-                    // TODO why is it ! instead of inverse??? lol
-                    if (relaxingNode.isAttraction) {
-                        attDistances.put(relaxingNode.dest, potential);
-                    }
+                    sourceDists.replace(tempVisitNode.dest, potential);
                 }
-                pq.add(relaxingNode);
+                pq.add(tempVisitNode);
+                if (tempVisitNode.isAttraction) {
+                    attDistances.put(tempVisitNode.dest, potential);
+                }
             }
+
         }
+
         marked.add(currentVisitNode);
         // TODO: update attDistances within this method if node.isAttraction put() or something
     }
 
     // TODO use to check after buildGraph and also add doc bc im too lazy to rn
-    public void printGraph() {
+    private void printGraph() {
         for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
             if (entry.getValue().isEmpty()) {
                 System.out.print(entry.getKey() + " is connected to nothing");
@@ -201,9 +200,20 @@ public class Graph {
     // note... print link by first retrieving ResultSet of just the row from attractions table with query PreparedStatement
     // then just System.out.println(RS.getString("website_link")); but probably a bit more complicated... lol
     protected void printOutput() {
+        int minDist = Collections.min(attDistances.values());
+        ArrayList<String> outputs = new ArrayList<>();
+
         for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
+
+        for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {
+            if (entry.getValue() == minDist) {
+                outputs.add(entry.getKey());
+            }
+        }
+
+        // TODO query the link
     }
 
     public static void main(String[] args) {
