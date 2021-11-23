@@ -4,16 +4,14 @@ import java.sql.*;
 import java.util.*;
 
 public class Graph {
-    // Nodes within Graph to store names of attractions, indicated by isAttraction, and attributes
+    // Nodes within Graph to store names of attractions and attributes
     private static class Node implements Comparable<Node> {
         private String dest;
         private int weight;
-        private final boolean isAttraction;
 
-        public Node(String dest, int weight, boolean isAttraction) {
+        public Node(String dest, int weight) {
             this.dest = dest;
             this.weight = weight;
-            this.isAttraction = isAttraction;
         }
 
         @Override
@@ -32,7 +30,7 @@ public class Graph {
         public boolean equals(Object o) {
             if (o instanceof Node) {
                 Node toCompare = (Node) o;
-                return toCompare.dest.equals(this.dest) && toCompare.weight == this.weight && toCompare.isAttraction == this.isAttraction;
+                return toCompare.dest.equals(this.dest) && toCompare.weight == this.weight;
             }
             return false;
         }
@@ -44,23 +42,24 @@ public class Graph {
         }*/
     }
 
-    // TODO Total number of nodes in graph object EDIT: probably not needed at all and if updated like below its not even accurate lol
-    private int size;
     // Adjacency list of relationships between attributes and attributes/attractions
     HashMap<String, LinkedList<Node>> relationships;
     // The sum of the shortest distances from all search attributes to each attraction
-    HashMap<String, Integer> attDistances = new HashMap<>();
-
+    HashMap<String, Integer> attDistances;
+    // Names of every attraction
+    HashSet<String> attractions;
 
     // Weighted undirected adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
     public Graph() {
         relationships = new HashMap<>();
-        size = 0;
+        attDistances = new HashMap<>();
+        attractions = new HashSet<>();
+        buildGraph();
     }
 
     // connects SOURCE and DEST together
     // all attractions should be passed in as SOURCE
-    private void addEdge(String source, String dest, int weight, boolean isAttraction) {
+    private void addEdge(String source, String dest, int weight) {
         // TODO: prob just set all weights to 1 by default and allow user to change with output report (zz)
 
         // TODO handle situations where LinkedList is not created yet -
@@ -73,73 +72,84 @@ public class Graph {
             relationships.put(dest, new LinkedList<>());
         }
 
-        relationships.get(dest).add(new Node(source, weight, isAttraction));
-        relationships.get(source).add(new Node(dest, weight, false));
-        // needed? size++;
+        relationships.get(source).add(new Node(dest, weight));
+        relationships.get(dest).add(new Node(source, weight));
     }
 
     // TODO: describe adding process for each table
-    protected void buildGraph() {
+    private void buildGraph() {
         try {
-            ResultSet attractions = Database.getAttractionsRS();
-            ResultSet counties = Database.getCountiesRS();
-            ResultSet descriptions = Database.getDescriptionsRS();
-            assert counties != null;
-            ResultSetMetaData countiesMD = counties.getMetaData();
-            assert descriptions != null;
-            ResultSetMetaData descMD = descriptions.getMetaData();
+            ResultSet attractionsRS = Database.getAttractionsRS();
+            ResultSet countiesRS = Database.getCountiesRS();
+            ResultSet descriptionsRS = Database.getDescriptionsRS();
             assert attractions != null;
+            assert countiesRS != null;
+            assert descriptionsRS != null;
+            ResultSetMetaData countiesMD = countiesRS.getMetaData();
+            ResultSetMetaData descriptionsMD = descriptionsRS.getMetaData();
+
 
             // add edges from the broadest attributes to the closest related attributes to attractions to ensure every attraction node is marked as an attraction
-            while (attractions.next()) {
-                counties.absolute(attractions.getInt("county_id"));
-                descriptions.absolute(attractions.getInt("descriptions_id"));
+            while (attractionsRS.next()) {
+                countiesRS.absolute(attractionsRS.getInt("county_id"));
+                descriptionsRS.absolute(attractionsRS.getInt("descriptions_id"));
 
-                this.addEdge(attractions.getString("location_name"), attractions.getString("type"), 1, true);
-                this.addEdge(attractions.getString("location_name"), attractions.getString("city"), 1, true);
-                this.addEdge(attractions.getString("location_name"), counties.getString("county"), 1, true);
+                this.addEdge(attractionsRS.getString("location_name"), attractionsRS.getString("type"), 1);
+                this.addEdge(attractionsRS.getString("location_name"), attractionsRS.getString("city"), 1);
+                this.addEdge(attractionsRS.getString("location_name"), countiesRS.getString("county"), 1);
+                this.attractions.add(attractionsRS.getString("location_name"));
 
-                for (int i = 1; i <= descMD.getColumnCount() - 1; i++) {
-                    if (descriptions.getString("desc" + i) != null) {
-                        this.addEdge(attractions.getString("location_name"), descriptions.getString("desc" + i), 1, true);
+                for (int i = 1; i <= descriptionsMD.getColumnCount() - 1; i++) {
+                    if (descriptionsRS.getString("desc" + i) != null) {
+                        this.addEdge(attractionsRS.getString("location_name"), descriptionsRS.getString("desc" + i), 1);
                     }
                 }
 
                 for (int i = 1; i <= countiesMD.getColumnCount() - 2; i++) {
-                    if (counties.getString("nc" + i) != null) {
-                        this.addEdge(counties.getString("county"), counties.getString("nc" + i), 1, false);
+                    if (countiesRS.getString("nc" + i) != null) {
+                        this.addEdge(countiesRS.getString("county"), countiesRS.getString("nc" + i), 1);
                     }
                 }
-
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+
+        for (String s : attractions) {
+            attDistances.put(s, 0);
         }
     }
 
     PriorityQueue<Node> pq;
     Set<Node> marked;
-    HashMap<String, Integer> sourceDists;
+    HashMap<String, Integer> sourceDistances;
     // Runs Dijkstra's algorithm from source, updating attDistances accordingly
     protected void dijkstra(String source) {
         // equalsIgnoreCase will be helpful yw
         pq = new PriorityQueue<>();
         marked = new HashSet<>();
-        sourceDists = new HashMap<>();
+        sourceDistances = new HashMap<>();
 
         for (String s : relationships.keySet()) {
-            sourceDists.put(s, Integer.MAX_VALUE);
+            sourceDistances.put(s, Integer.MAX_VALUE);
         }
 
-        sourceDists.replace(source, 0);
+        sourceDistances.replace(source, 0);
 
-        // maybe review this part?
-        pq.add(new Node(source, 0, false));
+        pq.add(new Node(source, 0));
 
         while (!pq.isEmpty()) {
             Node r = pq.poll();
             relax(r);
         }
+
+        for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {
+            if (attractions.contains(entry.getKey())) {
+                attDistances.replace(entry.getKey(), attDistances.get(entry.getKey()) + entry.getValue());
+            }
+
+        }
+
     }
 
     private void relax(Node currentVisitNode) {
@@ -148,15 +158,12 @@ public class Graph {
                 int initial;
                 int potential;
 
-                initial = sourceDists.get(tempVisitNode.dest);
-                potential = sourceDists.get(currentVisitNode.dest) + tempVisitNode.weight;
+                initial = sourceDistances.get(tempVisitNode.dest);
+                potential = sourceDistances.get(currentVisitNode.dest) + tempVisitNode.weight;
 
                 if (potential < initial) {
-                    sourceDists.replace(tempVisitNode.dest, potential);
+                    sourceDistances.replace(tempVisitNode.dest, potential);
                     // TODO need to figure out where and how to put this in (add to last search terms dists but how)
-                    if (tempVisitNode.isAttraction) {
-                        attDistances.put(tempVisitNode.dest, potential);
-                    }
                 }
                 pq.add(tempVisitNode);
             }
@@ -166,7 +173,7 @@ public class Graph {
 
     }
 
-    // TODO use to check after buildGraph and also add doc bc im too lazy to rn
+    // prints every attraction/attribute that every attraction/attribute is connected to
     private void printGraph() {
         for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
             if (entry.getValue().isEmpty()) {
@@ -207,14 +214,12 @@ public class Graph {
             }
         }
 
-        // TODO query the link
+        // TODO query the website link and print
     }
 
+    // TODO: remove at end
     public static void main(String[] args) {
         Graph g = new Graph();
-        g.buildGraph();
-        g.dijkstra("Food");
         g.printOutput();
-
     }
 }

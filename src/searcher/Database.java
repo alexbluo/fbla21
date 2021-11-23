@@ -131,7 +131,7 @@ public class Database {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM attractions;");
             return ps.executeQuery();
         } catch (Exception ex) {
-            ex. printStackTrace();
+            ex.printStackTrace();
         }
         return null;
     }
@@ -141,7 +141,7 @@ public class Database {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM counties;");
             return ps.executeQuery();
         } catch (Exception ex) {
-            ex. printStackTrace();
+            ex.printStackTrace();
         }
         return null;
     }
@@ -151,7 +151,7 @@ public class Database {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM descriptions;");
             return ps.executeQuery();
         } catch (Exception ex) {
-            ex. printStackTrace();
+            ex.printStackTrace();
         }
         return null;
     }

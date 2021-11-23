@@ -11,7 +11,6 @@ import java.io.*;
 
 public class Runner {
     public static void main(String[] args) throws IOException {
-        Graph graph = new Graph();
         try {
             System.out.println("Database connecting...");
             Database.buildTables();
@@ -20,18 +19,16 @@ public class Runner {
         } catch (Exception ex) {
             throw new IllegalStateException("Cannot connect to database", ex);
         }
-        graph.buildGraph();
+        Graph graph = new Graph();
 
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = null;
+        Scanner sc = new Scanner(System.in);
         String resp = "";
         // Prompts user for as many attributes as desired until they enter search, with optional help
         // TODO update/figure out \\o???
-        while (!resp.equals("\\e") && !resp.equals("\\o")) {
+        while (true) {
             System.out.print("Please enter an attribute you would like to search for, '\\h' for help menu, '\\o' to view and edit the output report, or '\\e' to exit: ");
-            st = new StringTokenizer(br.readLine());
-            resp = st.nextToken();
+            resp = sc.nextLine();
             System.out.println("");
 
             switch (resp) {
@@ -57,16 +54,17 @@ public class Runner {
 
                     System.out.println("");
                     break;
-                case "e":
+                case "\\e":
                     System.exit(0);
                     break;
                 default:
                     if (graph.validSearch(resp)) {
-                        System.out.println("Not a valid search attribute, please enter something else");
-                    } else {
                         graph.dijkstra(resp);
                         graph.printOutput();
+                    } else {
+                        System.out.println("Not a valid search attribute, please enter something else");
                     }
+                    System.out.println("");
                     break;
             }
         }
