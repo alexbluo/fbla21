@@ -1,7 +1,5 @@
 package searcher;
 
-import jdk.jfr.DataAmount;
-
 import java.sql.*;
 import java.util.*;
 
@@ -30,6 +28,9 @@ public class Graph {
         @Override
         // override equals so that it is possible to check if marked set contains a node in dijkstra
         public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
             if (o instanceof Node) {
                 Node toCompare = (Node) o;
                 return toCompare.dest.equals(this.dest) && toCompare.weight == this.weight;
@@ -37,11 +38,12 @@ public class Graph {
             return false;
         }
 
-        /*@Override
+        @Override
         // override hashcode because overriding equals
         public int hashCode() {
-            TODO put some hashing algo or something idk
-        }*/
+            int prime = 31;
+            hash = 
+        }
     }
 
     // Adjacency list of relationships between attributes and attributes/attractions
@@ -219,5 +221,9 @@ public class Graph {
                 ex.printStackTrace();
             }
         }
+    }
+
+    protected void printNextFive() {
+
     }
 }
