@@ -4,8 +4,6 @@ package searcher;
 import java.util.*;
 import java.io.*;
 
-
-
 // wtf is hot backup
 // wtf are output reports
 

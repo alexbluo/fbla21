@@ -8,7 +8,7 @@ public class Database {
     private static final Connection CON = getConnection();
 
     // gets and returns a connection to the server with the specified URL, USERNAME, and PASSWORD
-    private static Connection getConnection() {
+    protected static Connection getConnection() {
         final String URL = "jdbc:mysql://127.0.0.1:3306/mdcp";
         final String USERNAME = "luo";
         final String PASSWORD = "luoMySQL123";
@@ -118,9 +118,9 @@ public class Database {
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
                     "(id, location_name, website_link, type, city, county_id, descriptions_id)");
-            System.out.println(loadCountiesData.execute());
-            System.out.println(loadDescriptionsData.execute());
-            System.out.println(loadAttractionsData.execute());
+            loadCountiesData.execute();
+            loadDescriptionsData.execute();
+            loadAttractionsData.execute();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
