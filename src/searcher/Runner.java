@@ -56,6 +56,9 @@ public class Runner {
                     System.exit(0);
                     break;
                 default:
+                    if (resp.trim().length() != 0) {
+                        resp = (resp.substring(0, 1).toUpperCase() + resp.substring(1).toLowerCase()).trim();
+                    }
                     if (graph.validSearch(resp)) {
                         graph.dijkstra(resp);
                         graph.printOutput();

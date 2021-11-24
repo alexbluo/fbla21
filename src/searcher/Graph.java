@@ -1,5 +1,7 @@
 package searcher;
 
+import jdk.jfr.Threshold;
+
 import java.sql.*;
 import java.util.*;
 
@@ -38,12 +40,12 @@ public class Graph {
             return false;
         }
 
-        @Override
+        /*@Override
         // override hashcode because overriding equals
-        public int hashCode() {
+       /* public int hashCode() {
             int prime = 31;
-            hash = 
-        }
+            //hash =
+        }*/
     }
 
     // Adjacency list of relationships between attributes and attributes/attractions
@@ -192,10 +194,10 @@ public class Graph {
         }
     }
 
-    protected boolean validSearch(String resp) { return relationships.containsKey(resp); }
+    protected boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0; }
 
-    // TODO: add get output or some similar method to get and print... outputs...
     // add all lowest distance Strings from attDistances to a hashSet and do below for each
+
     // note... print link by first retrieving ResultSet of just the row from attractions table with query PreparedStatement
     // then just System.out.println(RS.getString("website_link")); but probably a bit more complicated... lol
     protected void printOutput() {
