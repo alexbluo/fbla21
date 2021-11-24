@@ -1,9 +1,7 @@
 package searcher;
 
-import jdk.jfr.Threshold;
-
-import java.sql.*;
 import java.util.*;
+import java.sql.*;
 
 public class Graph {
     // Nodes within Graph to store names of attractions and attributes
@@ -54,6 +52,8 @@ public class Graph {
     HashMap<String, Integer> attDistances;
     // Map of every attraction to their website links
     HashMap<String, String> attractionsAndLinks;
+    // Set of all already searched attributes to ensure that duplicate searches are not weighted differently
+    HashSet<String> searched;
 
 
     // Weighted undirected adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
@@ -61,17 +61,12 @@ public class Graph {
         relationships = new HashMap<>();
         attDistances = new HashMap<>();
         attractionsAndLinks = new HashMap<>();
+        searched = new HashSet<>();
         buildGraph();
     }
 
-    // connects SOURCE and DEST together
-    // all attractions should be passed in as SOURCE
+    // connects SOURCE and DEST together 
     private void addEdge(String source, String dest, int weight) {
-        // TODO: prob just set all weights to 1 by default and allow user to change with output report (zz)
-
-        // TODO handle situations where LinkedList is not created yet -
-        //  containsKey() else put(key, new LinkedList<Node>) and add to LL
-        //  if containsKey() then check if .get.contains() to check duplicates values for key alex what were u even thinking about when u wrote this /nvm
         if (!relationships.containsKey(source)) {
             relationships.put(source, new LinkedList<>());
         }
@@ -135,6 +130,7 @@ public class Graph {
         pq = new PriorityQueue<>();
         marked = new HashSet<>();
         sourceDistances = new HashMap<>();
+        searched.add(source);
 
         for (String s : relationships.keySet()) {
             sourceDistances.put(s, Integer.MAX_VALUE);
@@ -194,7 +190,7 @@ public class Graph {
         }
     }
 
-    protected boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0; }
+    protected boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0 && !searched.contains(resp); }
 
     // add all lowest distance Strings from attDistances to a hashSet and do below for each
 
@@ -202,30 +198,18 @@ public class Graph {
     // then just System.out.println(RS.getString("website_link")); but probably a bit more complicated... lol
     protected void printOutput() {
         int minDist = Collections.min(attDistances.values());
-        ArrayList<String> outputs = new ArrayList<>();
-
-        /*for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }*/
 
         for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {
             if (entry.getValue() == minDist) {
-                outputs.add(entry.getKey());
+                String output = entry.getKey();
+                try {
+                    String link = attractionsAndLinks.get(output);
+                    System.out.println(output);
+                    System.out.println("    " + link);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
-
-        for (String output : outputs) {
-            try {
-                String link = attractionsAndLinks.get(output);
-                System.out.println(output);
-                System.out.println("    " + link);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    protected void printNextFive() {
-
     }
 }
