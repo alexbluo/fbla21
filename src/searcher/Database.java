@@ -2,12 +2,13 @@ package searcher;
 
 import java.sql.*;
 
-// STATIC IS VERY SMALL PERFORMANCE COST IN INITIALIZING CON EVERY TIME BUT VERY SMALL MEMORY ADVANTAGE FOR NOT ALWAYS STORING STATES OF DATABASE,
-// OVERALL DOESN'T REALLY MATTER IN THE FIRST PLACE BC ONLY CALLED AT BEGINNING
 public class Database {
-    private static final Connection CON = getConnection();
 
-    // gets and returns a connection to the server with the specified URL, USERNAME, and PASSWORD
+    private static final Connection CON = getConnection();
+    /**
+     * Establishes a connection to the server with the specified URL, USERNAME, and PASSWORD.
+     * @return a connection to the server with the specified URL, USERNAME, and PASSWORD.
+     */
     protected static Connection getConnection() {
         final String URL = "jdbc:mysql://127.0.0.1:3306/mdcp";
         final String USERNAME = "luo";
@@ -21,31 +22,17 @@ public class Database {
         return c;
     }
 
-    /** 
-     * creates three tables with data loaded in from three different google sheets:
-     *
-     *
-     *
-     *
-     *
-     *
-      */
-
-    // 'attractions' contains names of locations as well as links to their websites
-    // 'attributes' contains the city (or whatever is specified on the address) that the location is in,
-    //     the type of attraction, one key description which is used as the foreign key of 'related_descriptions,'
-    //     and two supporting descriptions
-    // 'nearby_counties' contains the county as well as up to three nearby counties
-    // all tables except related_descriptions have a foreign key 'id' which refers to primary key 'id' of 'attractions'
-    // most locations in 'attractions' from https://www.busytourist.com/fun-things-to-do-in-maryland/
-    // nearby counties based on https://msa.maryland.gov/msa/mdmanual/36loc/html/02maps/seatb.html
-    // TODO: revise and edit (ex: ON UPDATE/DELETE CASCADE necessary?)
-    // TODO: maybe add indexing later?
+    /**
+     * Creates three tables with data to be loaded in from three different google sheets:
+     *     'attractions' contains names of locations, links to their websites, their city, and foreign keys 'county_id' and 'descriptions_id' which refer to 'id'
+     *          in the 'counties' and 'descriptions' table respectively
+     *     'counties' contains the county that the attraction in located in, along with up to three nearby counties.
+     *          For simplicity, only counties originally used for every attraction are used in the nearby counties
+     *     'descriptions' contains up to seven descriptions of their respective attraction
+     * Most locations in 'attractions' are taken from https://www.busytourist.com/fun-things-to-do-in-maryland/
+     */
     protected static void buildTables() {
         try {
-            // https://stackoverflow.com/questions/3271249/difference-between-statement-and-preparedstatement
-            // https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html
-
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
                     "county varchar(32) NOT NULL, " +
@@ -82,21 +69,20 @@ public class Database {
                     "FOREIGN KEY (descriptions_id) " +
                         "REFERENCES descriptions (id) ON UPDATE CASCADE ON DELETE CASCADE) " +
                     "ENGINE=INNODB;");
-            // TODO: maybe create tables of words related to each attribute later and add to graph as well
 
             createCountiesTable.executeUpdate();
             createDescriptionsTable.executeUpdate();
             createAttractionsTable.executeUpdate();
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    // loads csv files into tables
-    // ignore to prevent loading multiple times each run - https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#ignore-effect-on-execution basically INSERT IGNORE instead of just INSERT
-    // https://stackoverflow.com/questions/2675323/mysql-load-null-values-from-csv-data all hail guy on the internet
+    /**
+     * Loads locally downloaded csv files of aforementioned google sheets into tables.
+     * Multiple runs of the program will not load in data multiple times.
+     * Empty cells are loaded in as null.
+     */
     public static void loadData() {
         try {
             PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_counties.csv' IGNORE INTO TABLE mdcp.counties " +
@@ -126,6 +112,7 @@ public class Database {
                     "LINES TERMINATED BY '\\r\\n' " +
                     "IGNORE 1 LINES " +
                     "(id, location_name, website_link, type, city, county_id, descriptions_id)");
+
             loadCountiesData.execute();
             loadDescriptionsData.execute();
             loadAttractionsData.execute();
@@ -134,6 +121,10 @@ public class Database {
         }
     }
 
+    /**
+     * Queries the database for every field in 'attractions'.
+     * @return a ResultSet of every attraction.
+     */
     protected static ResultSet getAttractionsRS() {
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM attractions;");
@@ -144,6 +135,10 @@ public class Database {
         return null;
     }
 
+    /**
+     * Queries the database for every field in 'counties'.
+     * @return a ResultSet of every county and up to three nearby counties.
+     */
     protected static ResultSet getCountiesRS() {
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM counties;");
@@ -154,6 +149,10 @@ public class Database {
         return null;
     }
 
+    /**
+     * Queries the database for every field in 'descriptions'.
+     * @return a ResultSet of the descriptions.
+     */
     protected static ResultSet getDescriptionsRS() {
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM descriptions;");

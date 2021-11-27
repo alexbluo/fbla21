@@ -15,7 +15,7 @@ public class Graph {
         }
 
         @Override
-        // override compareTo so that nodes in priorityQueue can be sorted in dijkstra
+        // override compareTo so that nodes in PriorityQueue can be sorted in dijkstra
         public int compareTo(Node n) {
             if (this.weight > n.weight) {
                 return 1;
@@ -38,25 +38,25 @@ public class Graph {
             return false;
         }
 
-        /*@Override
-        // override hashcode because overriding equals
-       /* public int hashCode() {
+        // override hashCode because equals was overridden
+        @Override
+        public int hashCode() {
             int prime = 31;
-            //hash =
-        }*/
+            int hash;
+
+            return hash;
+        }
     }
 
-    // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, LinkedList<Node>> relationships;
-    // The sums of the shortest distances from all search attributes to each attraction
-    HashMap<String, Integer> attDistances;
-    // Map of every attraction to their website links
-    HashMap<String, String> attractionsAndLinks;
-    // Set of all already searched attributes to ensure that duplicate searches are not weighted differently
-    HashSet<String> searched;
+    HashMap<String, LinkedList<Node>> relationships;  // Adjacency list of relationships between attributes and attributes/attractions
+    HashMap<String, Integer> attDistances;            // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
+    HashMap<String, String> attractionsAndLinks;      // Map of every attraction to their website links, used in outputting links
+    HashSet<String> searched;                         // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
 
-
-    // Weighted undirected adjacency list (attRelationships) representing relationships between attributes and attributes as well as between attributes and attractions
+    /**
+     * Constructs a weighted undirected adjacency list representing relationships between attributes and other attributes as well as between attributes and attractions.
+     * Connects Nodes as specified in buildGraph();
+     */
     public Graph() {
         relationships = new HashMap<>();
         attDistances = new HashMap<>();
@@ -65,7 +65,12 @@ public class Graph {
         buildGraph();
     }
 
-    // connects SOURCE and DEST together 
+    /**
+     * Connects two attributes/attractions by adding them to the adjacency list, indicating a relationship.
+     * @param source - the name of the attribute/attraction to be connected.
+     * @param dest - the name of the second attribute/attraction to be connected.
+     * @param weight - the weighting of the edge representing the degree of relation, set to 1 by default.
+     */
     private void addEdge(String source, String dest, int weight) {
         if (!relationships.containsKey(source)) {
             relationships.put(source, new LinkedList<>());
@@ -78,7 +83,9 @@ public class Graph {
         relationships.get(dest).add(new Node(source, weight));
     }
 
-    // TODO: describe adding process for each table
+    /**
+     * Builds and connects the Nodes within the graph based on the database tables.
+     */
     private void buildGraph() {
         try {
             ResultSet attractionsRS = Database.getAttractionsRS();
@@ -90,22 +97,26 @@ public class Graph {
             ResultSetMetaData countiesMD = countiesRS.getMetaData();
             ResultSetMetaData descriptionsMD = descriptionsRS.getMetaData();
 
-            // add edges from the broadest attributes to the closest related attributes to attractions to ensure every attraction node is marked as an attraction
             while (attractionsRS.next()) {
+                // moves the cursors of the ResultSets to the row corresponding to the current location
                 countiesRS.absolute(attractionsRS.getInt("county_id"));
                 descriptionsRS.absolute(attractionsRS.getInt("descriptions_id"));
 
+                // connects the name of type of attraction, city, and county to the attraction that the cursor currently points at
                 this.addEdge(attractionsRS.getString("location_name"), attractionsRS.getString("type"), 1);
                 this.addEdge(attractionsRS.getString("location_name"), attractionsRS.getString("city"), 1);
                 this.addEdge(attractionsRS.getString("location_name"), countiesRS.getString("county"), 1);
+
+                // adds the maps the attraction name to its link
                 this.attractionsAndLinks.put(attractionsRS.getString("location_name"), attractionsRS.getString("website_link"));
 
+                // connects every description with the corresponding attraction
                 for (int i = 1; i <= descriptionsMD.getColumnCount() - 1; i++) {
                     if (descriptionsRS.getString("desc" + i) != null) {
                         this.addEdge(attractionsRS.getString("location_name"), descriptionsRS.getString("desc" + i), 1);
                     }
                 }
-
+                // connects every nearby county to the county that the attraction is located in
                 for (int i = 1; i <= countiesMD.getColumnCount() - 2; i++) {
                     if (countiesRS.getString("nc" + i) != null) {
                         this.addEdge(countiesRS.getString("county"), countiesRS.getString("nc" + i), 1);
@@ -116,6 +127,7 @@ public class Graph {
             ex.printStackTrace();
         }
 
+        // puts the name of every attraction into attDistances as a key, with the initial value set to 0 indicating the absence of search attributes
         for (String s : attractionsAndLinks.keySet()) {
             attDistances.put(s, 0);
         }
@@ -124,9 +136,12 @@ public class Graph {
     PriorityQueue<Node> pq;
     Set<Node> marked;
     HashMap<String, Integer> sourceDistances;
-    // Runs Dijkstra's algorithm from source, updating attDistances accordingly
+
+    /**
+     * Standard implementation of Dijkstra's algorithm with a PriorityQueue to determine the length of the shortest paths from the search attribute to each attraction.
+     * @param source the attribute which is being searched for
+     */
     protected void dijkstra(String source) {
-        // equalsIgnoreCase will be helpful yw
         pq = new PriorityQueue<>();
         marked = new HashSet<>();
         sourceDistances = new HashMap<>();
@@ -161,17 +176,16 @@ public class Graph {
 
                 if (potential < initial) {
                     sourceDistances.replace(tempVisitNode.dest, potential);
-                    // TODO need to figure out where and how to put this in (add to last search terms dists but how)
                 }
                 pq.add(tempVisitNode);
             }
         }
-
         marked.add(currentVisitNode);
-
     }
 
-    // prints every attraction/attribute that every attraction/attribute is connected to
+    /**
+     * Prints every attraction/attribute that every attraction/attribute is connected to.
+     */
     private void printGraph() {
         for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
             if (entry.getValue().isEmpty()) {
@@ -190,12 +204,18 @@ public class Graph {
         }
     }
 
+    /**
+     * Tests whether the string is empty, contained in the database, or has already been searched for.
+     * Failure for any of these cases returns false.
+     * @param resp - the attribute being searched for.
+     * @return the validity of the search attribute, determined by whether the string is empty, contained in the database, or has already been searched for.
+     */
     protected boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0 && !searched.contains(resp); }
 
-    // add all lowest distance Strings from attDistances to a hashSet and do below for each
-
-    // note... print link by first retrieving ResultSet of just the row from attractions table with query PreparedStatement
-    // then just System.out.println(RS.getString("website_link")); but probably a bit more complicated... lol
+    /*
+     * Prints the name and website link of the attraction related closest to all previously searched attributes.
+     * In the event of ties, every tied attribute is printed.
+     */
     protected void printOutput() {
         int minDist = Collections.min(attDistances.values());
 
