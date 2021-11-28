@@ -13,7 +13,7 @@ public class Runner {
             throw new IllegalStateException("Cannot connect to database", ex);
         }
         Graph graph = new Graph();
-
+        graph.printGraph();
         Scanner sc = new Scanner(System.in);
         String resp = "";
 
@@ -40,7 +40,7 @@ public class Runner {
                     break;
                 default:
                     if (resp.length() != 0) {
-                        resp = resp.substring(0, 1).toUpperCase() + resp.substring(1).toLowerCase();
+                        resp = capitalize(resp);
                     }
                     if (graph.validSearch(resp)) {
                         graph.dijkstra(resp);
@@ -52,5 +52,17 @@ public class Runner {
                     break;
             }
         }
+    }
+
+    private static String capitalize(String word) {
+        StringBuilder capitalizedWord = new StringBuilder();
+        String[] words = word.split(" ");
+        for (int i = 0; i < words.length; i++) {
+            capitalizedWord.append(words[i].substring(0, 1).toUpperCase()).append(words[i].substring(1).toLowerCase());
+            if (i != words.length - 1) {
+                capitalizedWord.append(" ");
+            }
+        }
+        return capitalizedWord.toString();
     }
 }

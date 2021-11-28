@@ -14,8 +14,9 @@ public class Graph {
             this.weight = weight;
         }
 
-        @Override
+
         // override compareTo so that nodes in PriorityQueue can be sorted in dijkstra
+        @Override
         public int compareTo(Node n) {
             if (this.weight > n.weight) {
                 return 1;
@@ -25,8 +26,8 @@ public class Graph {
             return 0;
         }
 
-        @Override
         // override equals so that it is possible to check if marked set contains a node in dijkstra
+        @Override
         public boolean equals(Object o) {
             if (o == this) {
                 return true;
@@ -43,7 +44,7 @@ public class Graph {
         public int hashCode() {
             int prime = 31;
             int hash;
-
+            hash =
             return hash;
         }
     }
@@ -67,13 +68,14 @@ public class Graph {
 
     /**
      * Connects two attributes/attractions by adding them to the adjacency list, indicating a relationship.
+     *
      * @param source - the name of the attribute/attraction to be connected.
      * @param dest - the name of the second attribute/attraction to be connected.
      * @param weight - the weighting of the edge representing the degree of relation, set to 1 by default.
      */
     private void addEdge(String source, String dest, int weight) {
         if (!relationships.containsKey(source)) {
-            relationships.put(source, new LinkedList<>());
+            relationships.put(source, new LinkedList<>());  // initializes a new LinkedList if one has not already been created for the key
         }
         if (!relationships.containsKey(dest)) {
             relationships.put(dest, new LinkedList<>());
@@ -91,7 +93,7 @@ public class Graph {
             ResultSet attractionsRS = Database.getAttractionsRS();
             ResultSet countiesRS = Database.getCountiesRS();
             ResultSet descriptionsRS = Database.getDescriptionsRS();
-            assert attractionsAndLinks != null;
+            assert attractionsRS != null;
             assert countiesRS != null;
             assert descriptionsRS != null;
             ResultSetMetaData countiesMD = countiesRS.getMetaData();
@@ -186,7 +188,7 @@ public class Graph {
     /**
      * Prints every attraction/attribute that every attraction/attribute is connected to.
      */
-    private void printGraph() {
+    void printGraph() {
         for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
             if (entry.getValue().isEmpty()) {
                 System.out.print(entry.getKey() + " is connected to nothing");
