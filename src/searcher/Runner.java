@@ -2,6 +2,7 @@ package searcher;
 
 import java.util.Scanner;
 
+// TODO: SAVE FOR LATER - https://stackoverflow.com/questions/215497/what-is-the-difference-between-public-protected-package-private-and-private-in#:~:text=public%20%3A%20accessible%20from%20everywhere.,classes%20of%20the%20same%20package.
 public class Runner {
     public static void main(String[] args) {
         try {

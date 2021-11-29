@@ -140,7 +140,7 @@ public class Graph {
      * Standard implementation of Dijkstra's algorithm with a PriorityQueue to determine the length of the shortest paths from the search attribute to each attraction.
      * @param source the attribute which is being searched for
      */
-    protected void dijkstra(String source) {
+    void dijkstra(String source) {
         pq = new PriorityQueue<>();
         marked = new HashSet<>();
         sourceDistances = new HashMap<>();
@@ -209,13 +209,13 @@ public class Graph {
      * @param resp - the attribute being searched for.
      * @return the validity of the search attribute, determined by whether the string is empty, contained in the database, or has already been searched for.
      */
-    protected boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0 && !searched.contains(resp); }
+    boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0 && !searched.contains(resp); }
 
     /*
      * Prints the name and website link of the attraction related closest to all previously searched attributes.
      * In the event of ties, every tied attribute is printed.
      */
-    protected void printOutput() {
+    void printOutput() {
         int minDist = Collections.min(attDistances.values());
 
         for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {

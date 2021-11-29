@@ -2,14 +2,14 @@ package searcher;
 
 import java.sql.*;
 
-public class Database {
-
+final class Database {
     private static final Connection CON = getConnection();
+
     /**
      * Establishes a connection to the server with the specified URL, USERNAME, and PASSWORD.
      * @return a connection to the server with the specified URL, USERNAME, and PASSWORD.
      */
-    protected static Connection getConnection() {
+    private static Connection getConnection() {
         final String URL = "jdbc:mysql://127.0.0.1:3306/mdcp";
         final String USERNAME = "luo";
         final String PASSWORD = "luoMySQL123";
@@ -31,7 +31,7 @@ public class Database {
      *     'descriptions' contains up to seven descriptions of their respective attraction
      * Most locations in 'attractions' are taken from https://www.busytourist.com/fun-things-to-do-in-maryland/
      */
-    protected static void buildTables() {
+    static void buildTables() {
         try {
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +
@@ -83,7 +83,7 @@ public class Database {
      * Multiple runs of the program will not load in data multiple times.
      * Empty cells are loaded in as null.
      */
-    public static void loadData() {
+    static void loadData() {
         try {
             PreparedStatement loadCountiesData = CON.prepareStatement("LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/mdcp_counties.csv' IGNORE INTO TABLE mdcp.counties " +
                     "FIELDS TERMINATED BY ',' " +
@@ -125,7 +125,7 @@ public class Database {
      * Queries the database for every field in 'attractions'.
      * @return a ResultSet of every attraction.
      */
-    protected static ResultSet getAttractionsRS() {
+    static ResultSet getAttractionsRS() {
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM attractions;");
             return ps.executeQuery();
@@ -139,7 +139,7 @@ public class Database {
      * Queries the database for every field in 'counties'.
      * @return a ResultSet of every county and up to three nearby counties.
      */
-    protected static ResultSet getCountiesRS() {
+    static ResultSet getCountiesRS() {
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM counties;");
             return ps.executeQuery();
@@ -153,7 +153,7 @@ public class Database {
      * Queries the database for every field in 'descriptions'.
      * @return a ResultSet of the descriptions.
      */
-    protected static ResultSet getDescriptionsRS() {
+    static ResultSet getDescriptionsRS() {
         try {
             PreparedStatement ps = CON.prepareStatement("SELECT * FROM descriptions;");
             return ps.executeQuery();
