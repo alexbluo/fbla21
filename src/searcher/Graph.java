@@ -42,10 +42,7 @@ public class Graph {
         // override hashCode because equals was overridden
         @Override
         public int hashCode() {
-            int prime = 31;
-            int hash;
-            hash =
-            return hash;
+            return this.dest.hashCode() * this.weight * 31;
         }
     }
 
