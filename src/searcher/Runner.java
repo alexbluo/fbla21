@@ -2,7 +2,6 @@ package searcher;
 
 import java.util.Scanner;
 
-// TODO: SAVE FOR LATER - https://stackoverflow.com/questions/215497/what-is-the-difference-between-public-protected-package-private-and-private-in#:~:text=public%20%3A%20accessible%20from%20everywhere.,classes%20of%20the%20same%20package.
 public class Runner {
     public static void main(String[] args) {
         try {
@@ -14,27 +13,37 @@ public class Runner {
             throw new IllegalStateException("Cannot connect to database", ex);
         }
         Graph graph = new Graph();
-        graph.printGraph();
         Scanner sc = new Scanner(System.in);
-        String resp = "";
+        boolean dijkstraToggle = false;
 
         // Prompts user for as many attributes as desired until they exit, with optional help menu
         // Program results update dynamically, and are outputted after each valid input
-        // TODO: allow for other search feature
         while (true) {
-            System.out.print("Please enter an attribute you would like to search for, '\\h' for help menu, or '\\e' to exit: ");
-            resp = sc.nextLine().trim();
+            System.out.print("Please enter an attribute you would like to search for, '\\t' to toggle a dijkstra's as the search method, '\\h' for help menu, or '\\e' to exit: ");
+            String resp = sc.nextLine().trim();
             System.out.println("");
 
             switch (resp) {
                 case "\\h":
+                    System.out.println("\\t toggles between two searching methods:");
+                    System.out.println("    Simple (default) will output the attractions which simply have the most of the searched attributes");
+                    System.out.println("    Dijkstra's will produce results abstracted by indirect relationships");
+                    System.out.println("Both run in the background regardless of toggling");
+                    System.out.println("");
                     System.out.println("For the most accurate results ensure that spelling is accurate, provide a city and county (including the word 'county' or 'city' for Baltimore City), and use plural nouns where appropriate");
+                    System.out.println("Capitalization and leading or trailing spaces do not matter");
                     System.out.println("Example: ");
-                    System.out.println("        Baltimore");
-                    System.out.println("        Sea Creatures");
-                    System.out.println("        Baltimore City");
-                    System.out.println("        Animals");
-                    System.out.println("        Fish");
+                    System.out.println("         Baltimore");
+                    System.out.println("         Sea Creatures");
+                    System.out.println("         Baltimore City");
+                    System.out.println("         Animals");
+                    System.out.println("         Fish");
+                    System.out.println("");
+                    break;
+                case "\\t":
+                    dijkstraToggle = !dijkstraToggle;
+                    System.out.println("Toggled to: " + (dijkstraToggle ? "Dijkstra's" : "Simple"));
+                    graph.printOutput(dijkstraToggle);
                     System.out.println("");
                     break;
                 case "\\e":
@@ -46,8 +55,8 @@ public class Runner {
                     }
                     if (graph.validSearch(resp)) {
                         graph.dijkstra(resp);
-                        // TODO: think abt this im too lazy rn
-                        graph.printOutput();
+                        graph.sparseSearch(resp);
+                        graph.printOutput(dijkstraToggle);
                     } else {
                         System.out.println("Search attribute has either already been searched for or is not recognized by database");
                     }
@@ -57,6 +66,11 @@ public class Runner {
         }
     }
 
+    /**
+     * Capitalizes the first letter of each word and makes everything else lowercase
+     * @param word - the word(s) to be capitalized
+     * @return the capitalized word
+     */
     private static String capitalize(String word) {
         StringBuilder capitalizedWord = new StringBuilder();
         String[] words = word.split(" ");

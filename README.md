@@ -1,7 +1,5 @@
 FBLA Coding and Programming 2021-2022 - Alex Luo
 
-https://www.fbla-pbl.org/media/2021/08/FBLA-CE-Guidelines-1.pdf
-
 2022 NLC Topic
 You have been hired by your state or local area’s tourism bureau to develop
 a program that suggests attractions (can be tourist attractions, restaurants,
@@ -11,8 +9,11 @@ location, type of attraction, and amenities. Your program must include at least
 50 attractions, and users must be able to define at least five desired attributes
 to search for an attraction.
 
-Competitors must show the judges any of the following that are applicable:
-readme file, source code, documentation of templates/libraries used,
-documentation of copyrighted material used.
+SQL libraries - used in Graph and Database
+https://docs.oracle.com/javase/8/docs/api/java/sql/PreparedStatement.html
+https://docs.oracle.com/javase/8/docs/api/java/sql/ResultSet.html
+https://docs.oracle.com/javase/8/docs/api/java/sql/ResultSetMetaData.html
+https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html
 
-rubric - https://www.fbla-pbl.org/media/2021/08/FBLA-Rating-Sheets.pdf
+Util package - used in Runner and Graph
+https://docs.oracle.com/javase/8/docs/api/java/util/package-summary.html

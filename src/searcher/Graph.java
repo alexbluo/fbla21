@@ -47,17 +47,18 @@ public class Graph {
     }
 
     HashMap<String, LinkedList<Node>> relationships;   // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, Integer> spareSearchSumDistances;  //
+    HashMap<String, Integer> sparseSearchSumDistances;  //
     HashMap<String, Integer> deepSearchSumDistances;   // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
     HashMap<String, String> attractionsAndLinks;       // Map of every attraction to their website links, used in outputting links
     HashSet<String> searched;                          // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
 
     /**
-     * Constructs a weighted undirected adjacency list representing relationships between attributes and other attributes as well as between attributes and attractions.
-     * Connects Nodes as specified in buildGraph();
+     * Constructs a weighted undirected graph represented by an adjacency list of relationships between attributes and other attributes as well as between attributes and attractions.
+     * Connects Nodes as specified in buildGraph().
      */
     public Graph() {
         relationships = new HashMap<>();
+        sparseSearchSumDistances = new HashMap<>();
         deepSearchSumDistances = new HashMap<>();
         attractionsAndLinks = new HashMap<>();
         searched = new HashSet<>();
@@ -129,6 +130,7 @@ public class Graph {
 
         // puts the name of every attraction into deepSearchSumDistances as a key, with the initial value set to 0 indicating the absence of search attributes
         for (String s : attractionsAndLinks.keySet()) {
+            sparseSearchSumDistances.put(s, Integer.MAX_VALUE);
             deepSearchSumDistances.put(s, 0);
         }
     }
@@ -138,7 +140,7 @@ public class Graph {
     HashMap<String, Integer> sourceDistances;
 
     /**
-     * Standard implementation of Dijkstra's algorithm with a PriorityQueue to determine the length of the shortest paths from the search attribute to each attraction.
+     * Standard implementation of Dijkstra's algorithm with a PriorityQueue to determine the length of the shortest paths from the search attribute to every attraction.
      * @param source the attribute which is being searched for
      */
     void dijkstra(String source) {
@@ -183,13 +185,25 @@ public class Graph {
         marked.add(currentVisitNode);
     }
 
-    private void sparseSearch() {
-
+    /**
+     * Finds all the attractions that the source attribute is connected to and updates sparseSearchSumDistances accordingly.
+     * @param source the attribute which is being searched for
+     */
+    void sparseSearch(String source) {
+        for (Node n : relationships.get(source)) {
+            if (attractionsAndLinks.containsKey(n.dest)) {
+                String loc = n.dest;
+                int prev = sparseSearchSumDistances.get(loc);
+                sparseSearchSumDistances.put(loc, prev - 1);
+            }
+        }
     }
+
     /**
      * Prints every attraction/attribute that every attraction/attribute is connected to.
+     * For development purposes only/
      */
-    void printGraph() {
+    private void printGraph() {
         for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
             if (entry.getValue().isEmpty()) {
                 System.out.print(entry.getKey() + " is connected to nothing");
@@ -215,23 +229,21 @@ public class Graph {
      */
     boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0 && !searched.contains(resp); }
 
-    /*
+    /**
      * Prints the name and website link of the attraction related closest to all previously searched attributes.
+     * Prints different results based on the toggle passed in.
      * In the event of ties, every tied attribute is printed.
+     * @param dijkstraToggle -
      */
-    void printOutput() {
-        int minDist = Collections.min(deepSearchSumDistances.values());
+    void printOutput(boolean dijkstraToggle) {
+        int minDist = Collections.min(dijkstraToggle ? deepSearchSumDistances.values() : sparseSearchSumDistances.values());
 
-        for (Map.Entry<String, Integer> entry : deepSearchSumDistances.entrySet()) {
+        for (Map.Entry<String, Integer> entry : dijkstraToggle ? deepSearchSumDistances.entrySet() : sparseSearchSumDistances.entrySet()) {
             if (entry.getValue() == minDist) {
                 String output = entry.getKey();
-                try {
-                    String link = attractionsAndLinks.get(output);
-                    System.out.println(output);
-                    System.out.println("    " + link);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                String link = attractionsAndLinks.get(output);
+                System.out.println(output);
+                System.out.println("    " + link);
             }
         }
     }
