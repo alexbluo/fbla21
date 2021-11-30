@@ -20,6 +20,7 @@ public class Runner {
 
         // Prompts user for as many attributes as desired until they exit, with optional help menu
         // Program results update dynamically, and are outputted after each valid input
+        // TODO: allow for other search feature
         while (true) {
             System.out.print("Please enter an attribute you would like to search for, '\\h' for help menu, or '\\e' to exit: ");
             resp = sc.nextLine().trim();
@@ -45,6 +46,7 @@ public class Runner {
                     }
                     if (graph.validSearch(resp)) {
                         graph.dijkstra(resp);
+                        // TODO: think abt this im too lazy rn
                         graph.printOutput();
                     } else {
                         System.out.println("Search attribute has either already been searched for or is not recognized by database");

@@ -46,10 +46,11 @@ public class Graph {
         }
     }
 
-    HashMap<String, LinkedList<Node>> relationships;  // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, Integer> attDistances;            // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
-    HashMap<String, String> attractionsAndLinks;      // Map of every attraction to their website links, used in outputting links
-    HashSet<String> searched;                         // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
+    HashMap<String, LinkedList<Node>> relationships;   // Adjacency list of relationships between attributes and attributes/attractions
+    HashMap<String, Integer> spareSearchSumDistances;  //
+    HashMap<String, Integer> deepSearchSumDistances;   // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
+    HashMap<String, String> attractionsAndLinks;       // Map of every attraction to their website links, used in outputting links
+    HashSet<String> searched;                          // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
 
     /**
      * Constructs a weighted undirected adjacency list representing relationships between attributes and other attributes as well as between attributes and attractions.
@@ -57,7 +58,7 @@ public class Graph {
      */
     public Graph() {
         relationships = new HashMap<>();
-        attDistances = new HashMap<>();
+        deepSearchSumDistances = new HashMap<>();
         attractionsAndLinks = new HashMap<>();
         searched = new HashSet<>();
         buildGraph();
@@ -126,9 +127,9 @@ public class Graph {
             ex.printStackTrace();
         }
 
-        // puts the name of every attraction into attDistances as a key, with the initial value set to 0 indicating the absence of search attributes
+        // puts the name of every attraction into deepSearchSumDistances as a key, with the initial value set to 0 indicating the absence of search attributes
         for (String s : attractionsAndLinks.keySet()) {
-            attDistances.put(s, 0);
+            deepSearchSumDistances.put(s, 0);
         }
     }
 
@@ -159,7 +160,7 @@ public class Graph {
 
         for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {
             if (attractionsAndLinks.containsKey(entry.getKey())) {
-                attDistances.replace(entry.getKey(), attDistances.get(entry.getKey()) + entry.getValue());
+                deepSearchSumDistances.replace(entry.getKey(), deepSearchSumDistances.get(entry.getKey()) + entry.getValue());
             }
         }
     }
@@ -182,6 +183,9 @@ public class Graph {
         marked.add(currentVisitNode);
     }
 
+    private void sparseSearch() {
+
+    }
     /**
      * Prints every attraction/attribute that every attraction/attribute is connected to.
      */
@@ -216,9 +220,9 @@ public class Graph {
      * In the event of ties, every tied attribute is printed.
      */
     void printOutput() {
-        int minDist = Collections.min(attDistances.values());
+        int minDist = Collections.min(deepSearchSumDistances.values());
 
-        for (Map.Entry<String, Integer> entry : attDistances.entrySet()) {
+        for (Map.Entry<String, Integer> entry : deepSearchSumDistances.entrySet()) {
             if (entry.getValue() == minDist) {
                 String output = entry.getKey();
                 try {
