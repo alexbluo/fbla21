@@ -14,7 +14,6 @@ public class Graph {
             this.weight = weight;
         }
 
-
         // override compareTo so that nodes in PriorityQueue can be sorted in dijkstra
         @Override
         public int compareTo(Node n) {
@@ -46,11 +45,11 @@ public class Graph {
         }
     }
 
-    HashMap<String, LinkedList<Node>> relationships;   // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, Integer> sparseSearchSumDistances;  //
-    HashMap<String, Integer> deepSearchSumDistances;   // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
-    HashMap<String, String> attractionsAndLinks;       // Map of every attraction to their website links, used in outputting links
-    HashSet<String> searched;                          // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
+    HashMap<String, LinkedList<Node>> relationships;    // Adjacency list of relationships between attributes and attributes/attractions
+    HashMap<String, Integer> sparseSearchSumDistances;  // An accumulation of the number of searched attributes directly connected to each attraction
+    HashMap<String, Integer> fullSearchSumDistances;    // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
+    HashMap<String, String> attractionsAndLinks;        // Map of every attraction to their website links, used in outputting links
+    HashSet<String> searched;                           // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
 
     /**
      * Constructs a weighted undirected graph represented by an adjacency list of relationships between attributes and other attributes as well as between attributes and attractions.
@@ -59,7 +58,7 @@ public class Graph {
     public Graph() {
         relationships = new HashMap<>();
         sparseSearchSumDistances = new HashMap<>();
-        deepSearchSumDistances = new HashMap<>();
+        fullSearchSumDistances = new HashMap<>();
         attractionsAndLinks = new HashMap<>();
         searched = new HashSet<>();
         buildGraph();
@@ -67,7 +66,6 @@ public class Graph {
 
     /**
      * Connects two attributes/attractions by adding them to the adjacency list, indicating a relationship.
-     *
      * @param source - the name of the attribute/attraction to be connected.
      * @param dest - the name of the second attribute/attraction to be connected.
      * @param weight - the weighting of the edge representing the degree of relation, set to 1 by default.
@@ -77,7 +75,7 @@ public class Graph {
             relationships.put(source, new LinkedList<>());  // initializes a new LinkedList if one has not already been created for the key
         }
         if (!relationships.containsKey(dest)) {
-            relationships.put(dest, new LinkedList<>());
+            relationships.put(dest, new LinkedList<>());    // initializes a new LinkedList if one has not already been created for the key
         }
 
         relationships.get(source).add(new Node(dest, weight));
@@ -128,10 +126,10 @@ public class Graph {
             ex.printStackTrace();
         }
 
-        // puts the name of every attraction into deepSearchSumDistances as a key, with the initial value set to 0 indicating the absence of search attributes
+        // puts the name of every attraction into searchSumDistances Maps as a key, with the initial value set to 0 indicating the absence of search attributes
         for (String s : attractionsAndLinks.keySet()) {
-            sparseSearchSumDistances.put(s, Integer.MAX_VALUE);
-            deepSearchSumDistances.put(s, 0);
+            sparseSearchSumDistances.put(s, 0);
+            fullSearchSumDistances.put(s, 0);
         }
     }
 
@@ -162,7 +160,7 @@ public class Graph {
 
         for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {
             if (attractionsAndLinks.containsKey(entry.getKey())) {
-                deepSearchSumDistances.replace(entry.getKey(), deepSearchSumDistances.get(entry.getKey()) + entry.getValue());
+                fullSearchSumDistances.replace(entry.getKey(), fullSearchSumDistances.get(entry.getKey()) + entry.getValue());
             }
         }
     }
@@ -194,30 +192,8 @@ public class Graph {
             if (attractionsAndLinks.containsKey(n.dest)) {
                 String loc = n.dest;
                 int prev = sparseSearchSumDistances.get(loc);
-                sparseSearchSumDistances.put(loc, prev - 1);
+                sparseSearchSumDistances.put(loc, prev + 1);
             }
-        }
-    }
-
-    /**
-     * Prints every attraction/attribute that every attraction/attribute is connected to.
-     * For development purposes only/
-     */
-    private void printGraph() {
-        for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
-            if (entry.getValue().isEmpty()) {
-                System.out.print(entry.getKey() + " is connected to nothing");
-            } else {
-                System.out.print(entry.getKey() + " is connected to: ");
-            }
-            for (int j = 0; j < entry.getValue().size(); j++) {
-                if (j == entry.getValue().size() - 1) {
-                    System.out.print(entry.getValue().get(j).dest + " with distance " + entry.getValue().get(j).weight);
-                } else {
-                    System.out.print(entry.getValue().get(j).dest + " with distance " + entry.getValue().get(j).weight + ", ");
-                }
-            }
-            System.out.println();
         }
     }
 
@@ -236,15 +212,36 @@ public class Graph {
      * @param dijkstraToggle -
      */
     void printOutput(boolean dijkstraToggle) {
-        int minDist = Collections.min(dijkstraToggle ? deepSearchSumDistances.values() : sparseSearchSumDistances.values());
-
-        for (Map.Entry<String, Integer> entry : dijkstraToggle ? deepSearchSumDistances.entrySet() : sparseSearchSumDistances.entrySet()) {
-            if (entry.getValue() == minDist) {
+        int searchVal = dijkstraToggle ? Collections.min(fullSearchSumDistances.values()) : Collections.max(sparseSearchSumDistances.values());  // sets the value to be searched for, based on dijkstraTog
+        for (Map.Entry<String, Integer> entry : dijkstraToggle ? fullSearchSumDistances.entrySet() : sparseSearchSumDistances.entrySet()) {
+            if (entry.getValue() == searchVal) {
                 String output = entry.getKey();
                 String link = attractionsAndLinks.get(output);
                 System.out.println(output);
                 System.out.println("    " + link);
             }
+        }
+    }
+
+    /**
+     * Prints every attraction/attribute that every attraction/attribute is connected to.
+     * For development purposes only
+     */
+    private void printGraph() {
+        for (Map.Entry<String, LinkedList<Node>> entry : relationships.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                System.out.print(entry.getKey() + " is connected to nothing");
+            } else {
+                System.out.print(entry.getKey() + " is connected to: ");
+            }
+            for (int j = 0; j < entry.getValue().size(); j++) {
+                if (j == entry.getValue().size() - 1) {
+                    System.out.print(entry.getValue().get(j).dest + " with distance " + entry.getValue().get(j).weight);
+                } else {
+                    System.out.print(entry.getValue().get(j).dest + " with distance " + entry.getValue().get(j).weight + ", ");
+                }
+            }
+            System.out.println();
         }
     }
 }

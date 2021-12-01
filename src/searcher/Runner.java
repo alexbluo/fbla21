@@ -19,32 +19,43 @@ public class Runner {
         // Prompts user for as many attributes as desired until they exit, with optional help menu
         // Program results update dynamically, and are outputted after each valid input
         while (true) {
-            System.out.print("Please enter an attribute you would like to search for, '\\t' to toggle a dijkstra's as the search method, '\\h' for help menu, or '\\e' to exit: ");
+            System.out.print("Please enter an attribute you would like to search for, '\\t' to toggle " + (dijkstraToggle ? "Simple" : "Dijkstra's") + " as the search method, '\\h' for help menu, or '\\e' to exit: ");
             String resp = sc.nextLine().trim();
             System.out.println("");
-
             switch (resp) {
                 case "\\h":
-                    System.out.println("\\t toggles between two searching methods:");
-                    System.out.println("    Simple (default) will output the attractions which simply have the most of the searched attributes");
-                    System.out.println("    Dijkstra's will produce results abstracted by indirect relationships");
-                    System.out.println("Both run in the background regardless of toggling");
-                    System.out.println("");
-                    System.out.println("For the most accurate results ensure that spelling is accurate, provide a city and county (including the word 'county' or 'city' for Baltimore City), and use plural nouns where appropriate");
-                    System.out.println("Capitalization and leading or trailing spaces do not matter");
-                    System.out.println("Example: ");
-                    System.out.println("         Baltimore");
-                    System.out.println("         Sea Creatures");
-                    System.out.println("         Baltimore City");
-                    System.out.println("         Animals");
-                    System.out.println("         Fish");
-                    System.out.println("");
+                    // help menu loop so user doesn't have to reenter '\h' to use both help commands
+                    while (!resp.equals("\\c")) {
+                        System.out.print("Enter '\\t' for an explanation of the \\t toggle, '\\g' for searching guidelines, or '\\c' to close the help menu at any time: ");
+                        resp = sc.nextLine().trim();
+                        System.out.println("");
+                        if (resp.equals("\\t")) {
+                            System.out.println("\\t toggles between two searching methods:");
+                            System.out.println("    Simple (default) will output the attractions which simply have the most of the searched attributes");
+                            System.out.println("    Dijkstra's will produce results abstracted by indirect relationships");
+                            System.out.println("Both run in the background regardless of toggling, which guarantees consistency regardless of the mode");
+                            System.out.println("- - - - - - - - - - - -");
+                        } else if (resp.equals("\\g")) {
+                            System.out.println("For the most accurate results ensure that spelling is accurate, provide a city and county (including the word 'county' or 'city' for Baltimore City), and use plural nouns where appropriate");
+                            System.out.println("Capitalization and leading or trailing spaces do not matter");
+                            System.out.println("Example: ");
+                            System.out.println("         Baltimore");
+                            System.out.println("         Sea Creatures");
+                            System.out.println("         Baltimore City");
+                            System.out.println("         Animals");
+                            System.out.println("         Fish");
+                            System.out.println("- - - - - - - - - - - -");
+                        } else {
+                            System.out.println("Not a command");
+                            System.out.println("- - - - - - - - - - - -");
+                        }
+                    }
                     break;
                 case "\\t":
                     dijkstraToggle = !dijkstraToggle;
                     System.out.println("Toggled to: " + (dijkstraToggle ? "Dijkstra's" : "Simple"));
                     graph.printOutput(dijkstraToggle);
-                    System.out.println("");
+                    System.out.println("- - - - - - - - - - - -");
                     break;
                 case "\\e":
                     System.exit(0);
@@ -60,7 +71,7 @@ public class Runner {
                     } else {
                         System.out.println("Search attribute has either already been searched for or is not recognized by database");
                     }
-                    System.out.println("");
+                    System.out.println("- - - - - - - - - - - -");
                     break;
             }
         }
