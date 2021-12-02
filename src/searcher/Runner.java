@@ -46,7 +46,9 @@ public class Runner {
                             System.out.println("         Fish");
                             System.out.println("- - - - - - - - - - - -");
                         } else {
-                            System.out.println("Not a command");
+                            if (!resp.equals("\\c")) {
+                                System.out.println("Not a command");
+                            }
                             System.out.println("- - - - - - - - - - - -");
                         }
                     }
