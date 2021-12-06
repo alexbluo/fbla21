@@ -31,7 +31,7 @@ final class Database {
      *     'descriptions' contains up to seven descriptions of their respective attraction
      * Most locations in 'attractions' are taken from https://www.busytourist.com/fun-things-to-do-in-maryland/
      */
-    static void buildTables() {
+    static void createTables() {
         try {
             PreparedStatement createCountiesTable = CON.prepareStatement("CREATE TABLE IF NOT EXISTS counties (" +
                     "id int NOT NULL AUTO_INCREMENT, " +

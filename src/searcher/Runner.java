@@ -6,7 +6,7 @@ public class Runner {
     public static void main(String[] args) {
         try {
             System.out.println("Database connecting...");
-            Database.buildTables();
+            Database.createTables();
             Database.loadData();
             System.out.println("Database connected!");
         } catch (Exception ex) {

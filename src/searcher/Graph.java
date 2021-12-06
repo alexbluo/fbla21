@@ -159,8 +159,8 @@ public class Graph {
         }
 
         for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {
-            if (attractionsAndLinks.containsKey(entry.getKey())) {
-                fullSearchSumDistances.replace(entry.getKey(), fullSearchSumDistances.get(entry.getKey()) + entry.getValue());
+            if (attractionsAndLinks.containsKey(entry.getKey())) {                                                              // if it is an attraction
+                fullSearchSumDistances.replace(entry.getKey(), fullSearchSumDistances.get(entry.getKey()) + entry.getValue());  // update distances based on previous values
             }
         }
     }
