@@ -195,6 +195,10 @@ public class Graph {
                 sparseSearchSumDistances.put(loc, prev + 1);
             }
         }
+        if (attractionsAndLinks.containsKey(source)) {
+            int prev = sparseSearchSumDistances.get(source);
+            sparseSearchSumDistances.put(source, prev + 1);
+        }
     }
 
     /**
