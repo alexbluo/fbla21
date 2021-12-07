@@ -16,7 +16,7 @@ public class Runner {
         Scanner sc = new Scanner(System.in);
         boolean dijkstraToggle = false;
 
-        // Prompts user for as many attributes as desired until they exit, with optional help menu
+        // Prompts user for as many attributes as desired until they enter '\e', with optional help menu by entering '\h'
         // Program results update dynamically, and are outputted after each valid input
         while (true) {
             System.out.print("Please enter an attribute you would like to search for, '\\t' to toggle " + (dijkstraToggle ? "Simple" : "Dijkstra's") + " as the search method, '\\h' for help menu, or '\\e' to exit: ");
@@ -31,12 +31,12 @@ public class Runner {
                         System.out.println("");
                         if (resp.equals("\\t")) {
                             System.out.println("\\t toggles between two searching methods:");
-                            System.out.println("    Simple (default) will output the attractions which simply have the most of the searched attributes");
-                            System.out.println("    Dijkstra's will produce results abstracted by indirect relationships");
-                            System.out.println("Both run in the background regardless of toggling, which guarantees consistency regardless of the mode");
+                            System.out.println("    Simple (default) will output the attractions which are simply directly related to most of the searched attributes");
+                            System.out.println("    Dijkstra's will produce results determined by both direct and indirect relationships");
+                            System.out.println("Both run in the background with every search, which guarantees consistency regardless of the mode");
                             System.out.println("- - - - - - - - - - - -");
                         } else if (resp.equals("\\g")) {
-                            System.out.println("For the most accurate results ensure that spelling is accurate, provide a city and county (including the word 'county' or 'city' for Baltimore City), and use plural nouns where appropriate");
+                            System.out.println("For the best results ensure that spelling is accurate, provide a city and county (including the word 'county' or 'city' for Baltimore City), and use plural nouns where appropriate");
                             System.out.println("Capitalization and leading or trailing spaces do not matter");
                             System.out.println("Example: ");
                             System.out.println("         Baltimore");
