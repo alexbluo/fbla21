@@ -68,7 +68,7 @@ public class Runner {
                     }
                     if (graph.validSearch(resp)) {
                         graph.dijkstra(resp);
-                        graph.sparseSearch(resp);
+                        graph.simpleSearch(resp);
                         graph.printOutput(dijkstraToggle);
                     } else {
                         System.out.println("Search attribute has either already been searched for or is not recognized by database");

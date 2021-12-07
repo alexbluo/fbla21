@@ -46,7 +46,7 @@ public class Graph {
     }
 
     HashMap<String, LinkedList<Node>> relationships;    // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, Integer> sparseSearchSumDistances;  // An accumulation of the number of searched attributes directly connected to each attraction
+    HashMap<String, Integer> simpleSearchSumDistances;  // An accumulation of the number of searched attributes directly connected to each attraction
     HashMap<String, Integer> fullSearchSumDistances;    // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
     HashMap<String, String> attractionsAndLinks;        // Map of every attraction to their website links, used in outputting links
     HashSet<String> searched;                           // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
@@ -57,11 +57,16 @@ public class Graph {
      */
     public Graph() {
         relationships = new HashMap<>();
-        sparseSearchSumDistances = new HashMap<>();
+        simpleSearchSumDistances = new HashMap<>();
         fullSearchSumDistances = new HashMap<>();
         attractionsAndLinks = new HashMap<>();
         searched = new HashSet<>();
         buildGraph();
+        // puts the name of every attraction into searchSumDistances Maps as a key, with the initial value set to 0 indicating the absence of search attributes
+        for (String s : attractionsAndLinks.keySet()) {
+            simpleSearchSumDistances.put(s, 0);
+            fullSearchSumDistances.put(s, 0);
+        }
     }
 
     /**
@@ -125,12 +130,6 @@ public class Graph {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        // puts the name of every attraction into searchSumDistances Maps as a key, with the initial value set to 0 indicating the absence of search attributes
-        for (String s : attractionsAndLinks.keySet()) {
-            sparseSearchSumDistances.put(s, 0);
-            fullSearchSumDistances.put(s, 0);
-        }
     }
 
     PriorityQueue<Node> pq;
@@ -139,7 +138,7 @@ public class Graph {
 
     /**
      * Standard implementation of Dijkstra's algorithm with a PriorityQueue to determine the length of the shortest paths from the search attribute to every attraction.
-     * @param source the attribute which is being searched for
+     * @param source - the attribute which is being searched for
      */
     void dijkstra(String source) {
         pq = new PriorityQueue<>();
@@ -184,28 +183,28 @@ public class Graph {
     }
 
     /**
-     * Finds all the attractions that the source attribute is connected to and updates sparseSearchSumDistances accordingly.
-     * @param source the attribute which is being searched for
+     * Finds all the attractions that the source attribute is connected to and updates simpleSearchSumDistances accordingly.
+     * @param source - the attribute which is being searched for
      */
-    void sparseSearch(String source) {
+    void simpleSearch(String source) {
         for (Node n : relationships.get(source)) {
             if (attractionsAndLinks.containsKey(n.dest)) {
                 String loc = n.dest;
-                int prev = sparseSearchSumDistances.get(loc);
-                sparseSearchSumDistances.put(loc, prev + 1);
+                int prev = simpleSearchSumDistances.get(loc);
+                simpleSearchSumDistances.put(loc, prev + 1);
             }
         }
         if (attractionsAndLinks.containsKey(source)) {
-            int prev = sparseSearchSumDistances.get(source);
-            sparseSearchSumDistances.put(source, prev + 1);
+            int prev = simpleSearchSumDistances.get(source);
+            simpleSearchSumDistances.put(source, prev + 1);
         }
     }
 
     /**
-     * Tests whether the string is empty, contained in the database, or has already been searched for.
+     * Tests the validity of the attribute based on whether the string is empty, contained in the database, or has already been searched for.
      * Failure for any of these cases returns false.
      * @param resp - the attribute being searched for.
-     * @return the validity of the search attribute, determined by whether the string is empty, contained in the database, or has already been searched for.
+     * @return the true if the search attribute is valid, false if not
      */
     boolean validSearch(String resp) { return relationships.containsKey(resp) && resp.length() != 0 && !searched.contains(resp); }
 
@@ -213,11 +212,11 @@ public class Graph {
      * Prints the name and website link of the attraction related closest to all previously searched attributes.
      * Prints different results based on the toggle passed in.
      * In the event of ties, every tied attribute is printed.
-     * @param dijkstraToggle -
+     * @param dijkstraToggle - a boolean set to true if the user is expecting the output of the Dijkstra's searching method, and false if the user is expecting output from the simple search
      */
     void printOutput(boolean dijkstraToggle) {
-        int searchVal = dijkstraToggle ? Collections.min(fullSearchSumDistances.values()) : Collections.max(sparseSearchSumDistances.values());  // sets the value to be searched for, based on dijkstraTog
-        for (Map.Entry<String, Integer> entry : dijkstraToggle ? fullSearchSumDistances.entrySet() : sparseSearchSumDistances.entrySet()) {
+        int searchVal = dijkstraToggle ? Collections.min(fullSearchSumDistances.values()) : Collections.max(simpleSearchSumDistances.values());  // sets the value to be searched for, based on dijkstraTog
+        for (Map.Entry<String, Integer> entry : dijkstraToggle ? fullSearchSumDistances.entrySet() : simpleSearchSumDistances.entrySet()) {
             if (entry.getValue() == searchVal) {
                 String output = entry.getKey();
                 String link = attractionsAndLinks.get(output);
