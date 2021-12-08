@@ -46,8 +46,8 @@ public class Graph {
     }
 
     HashMap<String, LinkedList<Node>> relationships;    // Adjacency list of relationships between attributes and attributes/attractions
-    HashMap<String, Integer> simpleSearchSumDistances;  // An accumulation of the number of searched attributes directly connected to each attraction
-    HashMap<String, Integer> fullSearchSumDistances;    // The sums of the shortest distances from all search attributes to each attraction, used in determining outputs
+    HashMap<String, Integer> simpleSumPoints;           // An accumulation of the number of searched attributes directly connected to each attraction
+    HashMap<String, Integer> dijkstraSumDistances;      // The sums of the shortest distances from all search attributes to each attraction
     HashMap<String, String> attractionsAndLinks;        // Map of every attraction to their website links, used in outputting links
     HashSet<String> searched;                           // Set of all already searched attributes to ensure that duplicate searches are not weighted extra
 
@@ -57,15 +57,15 @@ public class Graph {
      */
     public Graph() {
         relationships = new HashMap<>();
-        simpleSearchSumDistances = new HashMap<>();
-        fullSearchSumDistances = new HashMap<>();
+        simpleSumPoints = new HashMap<>();
+        dijkstraSumDistances = new HashMap<>();
         attractionsAndLinks = new HashMap<>();
         searched = new HashSet<>();
         buildGraph();
         // puts the name of every attraction into searchSumDistances Maps as a key, with the initial value set to 0 indicating the absence of search attributes
         for (String s : attractionsAndLinks.keySet()) {
-            simpleSearchSumDistances.put(s, 0);
-            fullSearchSumDistances.put(s, 0);
+            simpleSumPoints.put(s, 0);
+            dijkstraSumDistances.put(s, 0);
         }
     }
 
@@ -157,9 +157,9 @@ public class Graph {
             relax(r);
         }
 
-        for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {
-            if (attractionsAndLinks.containsKey(entry.getKey())) {                                                              // if it is an attraction
-                fullSearchSumDistances.replace(entry.getKey(), fullSearchSumDistances.get(entry.getKey()) + entry.getValue());  // update distances based on previous values
+        for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {                                                   // iterate through every node and their distance from source
+            if (attractionsAndLinks.containsKey(entry.getKey())) {                                                              // if the node is an attraction
+                dijkstraSumDistances.replace(entry.getKey(), dijkstraSumDistances.get(entry.getKey()) + entry.getValue());  // update distances based on previous values
             }
         }
     }
@@ -183,20 +183,20 @@ public class Graph {
     }
 
     /**
-     * Finds all the attractions that the source attribute is connected to and updates simpleSearchSumDistances accordingly.
+     * Finds all the attractions that the source attribute is directly connected to and updates simpleSumPoints accordingly.
      * @param source - the attribute which is being searched for
      */
     void simpleSearch(String source) {
-        for (Node n : relationships.get(source)) {
-            if (attractionsAndLinks.containsKey(n.dest)) {
+        for (Node n : relationships.get(source)) {             // iterate through every node that the source is directly connected to
+            if (attractionsAndLinks.containsKey(n.dest)) {     // add a 'point' to the attraction if the node is an attraction, favoring those higher points as possible outputs
                 String loc = n.dest;
-                int prev = simpleSearchSumDistances.get(loc);
-                simpleSearchSumDistances.put(loc, prev + 1);
+                int prev = simpleSumPoints.get(loc);
+                simpleSumPoints.put(loc, prev + 1);
             }
         }
-        if (attractionsAndLinks.containsKey(source)) {
-            int prev = simpleSearchSumDistances.get(source);
-            simpleSearchSumDistances.put(source, prev + 1);
+        if (attractionsAndLinks.containsKey(source)) {  // handle cases where the source is an attraction by adding a point to that attraction
+            int prev = simpleSumPoints.get(source);
+            simpleSumPoints.put(source, prev + 1);
         }
     }
 
@@ -215,14 +215,27 @@ public class Graph {
      * @param dijkstraToggle - a boolean set to true if the user is expecting the output of the Dijkstra's searching method, and false if the user is expecting output from the simple search
      */
     void printOutput(boolean dijkstraToggle) {
-        int searchVal = dijkstraToggle ? Collections.min(fullSearchSumDistances.values()) : Collections.max(simpleSearchSumDistances.values());  // sets the value to be searched for, based on dijkstraTog
-        for (Map.Entry<String, Integer> entry : dijkstraToggle ? fullSearchSumDistances.entrySet() : simpleSearchSumDistances.entrySet()) {
+        int searchVal = dijkstraToggle ? Collections.min(dijkstraSumDistances.values()) : Collections.max(simpleSumPoints.values());  // Dijkstra's favors the lowest sum distances, while simple favors the highest sum points
+        for (Map.Entry<String, Integer> entry : dijkstraToggle ? dijkstraSumDistances.entrySet() : simpleSumPoints.entrySet()) {
             if (entry.getValue() == searchVal) {
                 String output = entry.getKey();
                 String link = attractionsAndLinks.get(output);
                 System.out.println(output);
                 System.out.println("    " + link);
             }
+        }
+    }
+
+    /**
+     * Sets up the graph class as if the program were being rerun or a new graph were being instantiated, except without redundant steps
+     */
+    public void resetGraph() {
+        simpleSumPoints.clear();
+        dijkstraSumDistances.clear();
+        searched.clear();
+        for (String s : attractionsAndLinks.keySet()) {
+            simpleSumPoints.put(s, 0);
+            dijkstraSumDistances.put(s, 0);
         }
     }
 

@@ -19,7 +19,7 @@ public class Runner {
         // Prompts user for as many attributes as desired until they enter '\e', with optional help menu by entering '\h'
         // Program results update dynamically, and are outputted after each valid input
         while (true) {
-            System.out.print("Please enter an attribute you would like to search for, '\\t' to toggle " + (dijkstraToggle ? "Simple" : "Dijkstra's") + " as the search method, '\\h' for help menu, or '\\e' to exit: ");
+            System.out.print("Enter an attribute you would like to search for, '\\t' to toggle to " + (dijkstraToggle ? "Simple" : "Dijkstra's") + ", '\\h' for help menu, '\\r' to start a fresh search, or '\\e' to exit: ");
             String resp = sc.nextLine().trim();
             System.out.println("");
             switch (resp) {
@@ -58,6 +58,12 @@ public class Runner {
                     System.out.println("Toggled to: " + (dijkstraToggle ? "Dijkstra's" : "Simple"));
                     graph.printOutput(dijkstraToggle);
                     System.out.println("- - - - - - - - - - - -");
+                    break;
+                case "\\r":
+                    System.out.println("Restarted");
+                    System.out.println("- - - - - - - - - - - -");
+                    graph.resetGraph();
+                    dijkstraToggle = false;
                     break;
                 case "\\e":
                     System.exit(0);
