@@ -188,7 +188,7 @@ public class Graph {
      */
     void simpleSearch(String source) {
         for (Node n : relationships.get(source)) {             // iterate through every node that the source is directly connected to
-            if (attractionsAndLinks.containsKey(n.dest)) {     // add a 'point' to the attraction if the node is an attraction, favoring those higher points as possible outputs
+            if (attractionsAndLinks.containsKey(n.dest)) {     // add a 'point' to the attraction if the node is an attraction, favoring higher points as possible outputs
                 String loc = n.dest;
                 int prev = simpleSumPoints.get(loc);
                 simpleSumPoints.put(loc, prev + 1);
@@ -229,7 +229,7 @@ public class Graph {
     /**
      * Sets up the graph class as if the program were being rerun or a new graph were being instantiated, except without redundant steps
      */
-    public void resetGraph() {
+    public void reset() {
         simpleSumPoints.clear();
         dijkstraSumDistances.clear();
         searched.clear();

@@ -31,8 +31,8 @@ public class Runner {
                         System.out.println("");
                         if (resp.equals("\\t")) {
                             System.out.println("\\t toggles between two searching methods:");
-                            System.out.println("    Simple (default) will output the attractions which are simply directly related to most of the searched attributes");
-                            System.out.println("    Dijkstra's will produce results determined by both direct and indirect relationships");
+                            System.out.println("    Simple (default) will output attractions which are directly related to the most of the searched attributes");
+                            System.out.println("    Dijkstra's will produce results determined by both direct and indirect relationships, and results tend to be narrowed down compared to Simple");
                             System.out.println("Both run in the background with every search, which guarantees consistency regardless of the mode");
                             System.out.println("- - - - - - - - - - - -");
                         } else if (resp.equals("\\g")) {
@@ -62,7 +62,7 @@ public class Runner {
                 case "\\r":
                     System.out.println("Restarted");
                     System.out.println("- - - - - - - - - - - -");
-                    graph.resetGraph();
+                    graph.reset();
                     dijkstraToggle = false;
                     break;
                 case "\\e":
@@ -88,7 +88,7 @@ public class Runner {
     /**
      * Capitalizes the first letter of each word and makes everything else lowercase
      * @param word - the word(s) to be capitalized
-     * @return the capitalized word
+     * @return the capitalized word(s)
      */
     private static String capitalize(String word) {
         StringBuilder capitalizedWord = new StringBuilder();
