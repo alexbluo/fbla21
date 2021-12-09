@@ -26,9 +26,9 @@ final class Database {
      * Creates three tables with data to be loaded in from three different google sheets:
      *     'attractions' contains names of locations, links to their websites, their city, and foreign keys 'county_id' and 'descriptions_id' which refer to 'id'
      *          in the 'counties' and 'descriptions' table respectively
-     *     'counties' contains the county that the attraction in located in, along with up to three nearby counties.
+     *     'counties' contains the names of counties along with up to three nearby counties.
      *          For simplicity, only counties originally used for every attraction are used in the nearby counties
-     *     'descriptions' contains up to seven descriptions of their respective attraction
+     *     'descriptions' contains up to seven descriptions
      * Most locations in 'attractions' are taken from https://www.busytourist.com/fun-things-to-do-in-maryland/
      */
     static void createTables() {
