@@ -157,8 +157,8 @@ public class Graph {
             relax(r);
         }
 
-        for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {                                                   // iterate through every node and their distance from source
-            if (attractionsAndLinks.containsKey(entry.getKey())) {                                                              // if the node is an attraction
+        for (Map.Entry<String, Integer> entry : sourceDistances.entrySet()) {                                               // iterate through every node and their distance from source
+            if (attractionsAndLinks.containsKey(entry.getKey())) {                                                          // if the node is an attraction
                 dijkstraSumDistances.replace(entry.getKey(), dijkstraSumDistances.get(entry.getKey()) + entry.getValue());  // update distances based on previous values
             }
         }
